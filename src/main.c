@@ -168,6 +168,32 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 	return file;
 }
 
+int mx_num_of_cols(char **files_in_dir, int count) {
+	struct winsize w;
+	int max_len = mx_count_max_len(char **files_in_dir);
+	int cols = 0;
+	int lines = 0;
+
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	cols = (w.ws_col / ((8 - (max_len % 8)) + max_len));
+	lines = count / cols; //количество елементов вывода
+	if (lines == 0 || ((count % cols) != 0))
+		lines++;
+	return lines;
+}
+
+
+
+int mx_count_max_len(char **files_in_dir) {
+	int max = mx_strlen(files_in_dir[0]);
+
+	for (int i = 0; files_in_dir[i + 1]; i++) {
+		if (mx_strlen(files_in_dir[i]) < mx_strlen(files_in_dir[i + 1]))
+			max = mx_strlen(files_in_dir[i + 1]);
+	}
+	return max;
+}
+
 void mx_current_directory(t_flag *flags, char *dir_name) {
 	DIR *dir = opendir(dir_name);
 	struct dirent *entry;
@@ -205,6 +231,7 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 	for (int j = 0; files_in_dir[j]; j++) {
 		printf("FILES IN DIR = %s\n", files_in_dir[j]);
 	}
+	printf("MAX LEN IN DIR = %d\n", mx_count_max_len(files_in_dir));
 }
 
 int main(int ac, char **av)
