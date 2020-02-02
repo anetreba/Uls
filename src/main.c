@@ -1,114 +1,5 @@
 #include "uls.h"
 
-// int mx_num_of_cols(t_info *info) {
-// 	struct winsize w;
-// 	int max_len = 0;
-// 	int cols = 0;
-// 	int lines = 0;
-
-// 	for (t_uni_list *tmp = info->sub_args; tmp; tmp = tmp->next)
-// 		if (max_len < mx_strlen(tmp->data))
-// 			max_len = mx_strlen(tmp->data);
-// 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-// 	cols = (w.ws_col / ((8 - (max_len % 8)) + max_len));
-// 	lines = info->num_of_sub / cols; //количество елементов вывода
-// 	if (lines == 0 || ((info->num_of_sub % cols) != 0))
-// 		lines++;
-// 	info->max_sub_len = max_len;
-// 	return lines;
-// }
-
-
-// int mx_count_elem_in_dir(char *av) {
-// 	DIR *dir = opendir(av);
-// 	struct dirent *entry;
-// 	int count_elem = 0;
-
-// 	while ((entry = readdir(dir)) != NULL)
-// 		if (entry->d_name[0] != '.')
-// 			count_elem++;
-// 	return count_elem;
-// }
-
-// int mx_count_max_len(t_folder *folder, int ac) {
-// 	int max = 0;
-// 	DIR *dir = opendir(av);
-// 	struct dirent *entry;
-
-// 	while ((entry = readdir(dir))->next != NULL) {
-// 		if (mx_strlen(entry->d_name) < mx_strlen(entry->next)) 
-// 			mx_printstr(entry->d_name);
-// 		}
-// 	return max;
-// }
-
-// // bool mx_file_exist(int ac, char **av) {
-// // 	if (ac != 1) {
-// // 		if
-// // 	}
-// // }
-
-// // bool mx_folder_exist(int ac, char **av) {
-
-// // }
-
-// // bool mx_flag_exist(int ac, char **av) {
-
-// // }
-
-
-
-// void mx_get_info(int ac, char **av, t_all_info *info, t_folder *folder) {
-// 	info->ac = ac;
-// 	info->av = av;
-
-// 	for (int i = 0; i < ac - 1; i++) {
-// 		folder[i].name = av[i + 1];
-// 		folder[i].num_of_sub = mx_count_elem_in_dir(av[i + 1]);
-
-// 	}
-// }
-
-// int main(int ac, char const **av) {
-// 	// DIR *dir;
-// 	// struct dirent *entry;
-// 	// t_all_info *info = (t_all_info *)malloc(sizeof(t_all_info));
-// 	// t_folder *folder = (t_folder *)malloc(sizeof(t_folder) * (ac - 1));
-
-// 	// if (ac == 1) {
-		
-// 	// 	// dir = opendir(".");
-// 	// 	// if (!dir) {
-// 	// 	// 	perror("diropen");
-// 	// 	// 	exit(1);
-// 	// 	// }
-// 	// 	// while ((entry = readdir(dir)) != NULL) {
-// 	// 	// 	if (entry->d_name[0] != '.')
-// 	// 	// 		mx_printstr(entry->d_name);
-// 	// 	// }
-// 	// }
-// 	// else {
-// 	// 	for (int i = 1; i < ac; i++) {
-// 	// 		dir = opendir(av[i]);
-// 	// 		if (!dir) {
-// 	// 			perror("diropen");
-// 	// 			exit(1);
-// 	// 		}
-// 	// 		mx_printstr(av[i]);
-// 	// 		mx_printstr(": \n");
-// 	// 		while ((entry = readdir(dir)) != NULL) {
-// 	// 			if (entry->d_name[0] != '.') 
-// 	// 				mx_printstr(entry->d_name);
-// 	// 		}
-// 	// 		mx_printchar('\n');
-// 	// 		if (i != ac - 1) {
-// 	// 			mx_printchar('\n');
-// 	// 		}
-// 	// 	}
-// 	// }
-// 	return 0;
-// }
-
 char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 	char flag[] = "Aal";
 	bool flag_priority = true;
@@ -130,6 +21,7 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 						mx_printerr("uls: illegal option -- ");
 						mx_printerr(&av[i][j]);
 						mx_printerr("\nusage: ls [-Aal] [file ...]");
+						exit(1);
 					}
 				}
 			}
@@ -144,7 +36,7 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 			count_files++;
 		}
 	}
-	printf("COUNT FILES = %d\n", count_files);
+	// printf("COUNT FILES = %d\n", count_files);
 
 	flag_priority = true;
 	file = (char **)malloc(sizeof(char *) * (count_files + 1));
@@ -168,9 +60,20 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 	return file;
 }
 
+
+int mx_count_max_len(char **files_in_dir) {
+	int max = mx_strlen(files_in_dir[0]);
+
+	for (int i = 1; files_in_dir[i]; i++) {
+		if (max < mx_strlen(files_in_dir[i]))
+			max = mx_strlen(files_in_dir[i]);
+	}
+	return max;
+}
+
 int mx_num_of_cols(char **files_in_dir, int count) {
 	struct winsize w;
-	int max_len = mx_count_max_len(char **files_in_dir);
+	int max_len = mx_count_max_len(files_in_dir);
 	int cols = 0;
 	int lines = 0;
 
@@ -182,17 +85,44 @@ int mx_num_of_cols(char **files_in_dir, int count) {
 	return lines;
 }
 
-
-
-int mx_count_max_len(char **files_in_dir) {
-	int max = mx_strlen(files_in_dir[0]);
-
-	for (int i = 0; files_in_dir[i + 1]; i++) {
-		if (mx_strlen(files_in_dir[i]) < mx_strlen(files_in_dir[i + 1]))
-			max = mx_strlen(files_in_dir[i + 1]);
-	}
-	return max;
+void mx_choose_print_action(char *files_in_dir) {
+	mx_printstr(files_in_dir);
 }
+
+void basic_tab_print(int arg_len, int max_len) {
+	int max_tabs = max_len / 8 + 1;
+	int tab_len = arg_len / 8;
+
+	if (tab_len < max_tabs) {
+		write(1, "\t", 1);
+		tab_len++;
+	}
+	while (max_tabs > tab_len) {
+		write(1, "\t", 1);
+		tab_len++;
+	}
+}
+
+void mx_basic_print(char **files_in_dir, int count, int max_len) {
+	int j;
+	int sub_r;
+	int num_of_lines = mx_num_of_cols(files_in_dir, count);
+
+	for (int i = 0; i < num_of_lines; i++) {
+		j = 0;
+		sub_r = 0;
+		for (int j = 0; files_in_dir[j]; j++) {
+			if ((j + num_of_lines - i) % num_of_lines == 0) {
+				mx_choose_print_action(files_in_dir[j]);
+				if (sub_r + num_of_lines < count)
+					basic_tab_print(mx_strlen(files_in_dir[j]), max_len);
+			}
+			++sub_r;
+		}
+		mx_printchar('\n');
+	}
+}
+
 
 void mx_current_directory(t_flag *flags, char *dir_name) {
 	DIR *dir = opendir(dir_name);
@@ -227,11 +157,64 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 			files_in_dir[i++] = mx_strdup(entry->d_name);
 	}
 	files_in_dir[i] = NULL;
+	closedir(dir);
+	mx_bubble_sort(files_in_dir, count);
+	int max_len = mx_count_max_len(files_in_dir);
+	mx_basic_print(files_in_dir, count, max_len);
+}
 
-	for (int j = 0; files_in_dir[j]; j++) {
-		printf("FILES IN DIR = %s\n", files_in_dir[j]);
+void mx_files_and_dir(char **file, t_flag *flags) {
+	struct stat buf;
+	int dir_count = 0;
+	int file_count = 0;
+
+	for (int i = 0; file[i]; i++) {
+		if (lstat(file[i], &buf) >= 0) {
+			if ((buf.st_mode & S_IFDIR) != S_IFDIR)
+                    file_count += 1;
+            else if (((buf.st_mode & S_IFDIR) == S_IFDIR))
+                    dir_count += 1;
+		}
+		else {
+			mx_printerr("uls: ");
+			mx_printerr(file[i]);
+			mx_printerr(": No such file or directory");
+			exit(1);
+		}
 	}
-	printf("MAX LEN IN DIR = %d\n", mx_count_max_len(files_in_dir));
+
+	// printf("FILES COUNT = %d\n", file_count);
+	// printf("DIR COUNT= %d\n", dir_count);
+
+	char **files = (char **)malloc(sizeof(char *) * (file_count + 1));
+	char **dirs = (char **)malloc(sizeof(char *) * (dir_count + 1));
+	int i = 0;
+	int k = 0;
+
+	for (int j = 0; file[j]; j++) {
+		if (lstat(file[j], &buf) >= 0) {
+			if ((buf.st_mode & S_IFDIR) != S_IFDIR)
+				files[i++] = mx_strdup(file[j]);
+			else if (((buf.st_mode & S_IFDIR) == S_IFDIR))
+				dirs[k++] = mx_strdup(file[j]); 
+		}
+	}
+	files[file_count] = NULL;
+	dirs[dir_count] = NULL;
+
+	mx_bubble_sort(files, file_count);
+	int max_len = mx_count_max_len(files);
+	mx_basic_print(files, file_count, max_len);
+
+	mx_bubble_sort(dirs, dir_count);
+	for (int j = 0; dirs[j]; j++) {
+		mx_printstr(dirs[j]);
+		mx_printchar(':');
+		mx_printstr("\n");
+		mx_current_directory(flags, dirs[j]);
+		mx_printstr("\n");
+		printf("suka\n");
+	}
 }
 
 int main(int ac, char **av)
@@ -240,14 +223,13 @@ int main(int ac, char **av)
 	char **file = NULL;
 	mx_memset(flags, 0, sizeof(t_flag));
 	file = mx_valid_flag(ac, av, flags);
-	for (int i = 0; file[i]; i++)
-		printf("FILE = %s ", file[i]);
-	printf("\n");
-	if (file[0] == NULL) {
+	// for (int i = 0; file[i]; i++)
+	// 	printf("FILE = %s ", file[i]);
+	// printf("\n");
+	if (file[0] == NULL)
 		mx_current_directory(flags, ".");
+	else {
+		mx_files_and_dir(file, flags);
 	}
-	// else {
-
-	// }
 	return 0;
 }
