@@ -1,7 +1,8 @@
 #include "uls.h"
 
+
 char **mx_valid_flag(int ac, char **av, t_flag *flags) {
-	char flag[] = "Aal";
+	char flag[] = "AaRl";
 	bool flag_priority = true;
 	int count_files = 0;
 	char **file = NULL;
@@ -15,11 +16,14 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 						flags->flag_A = true;
 					else if (av[i][j] == flag[1])
 						flags->flag_a = true;
-					else if (av[i][j] == flag[2])
+					else if (av[i][j] == flag[3])
 						flags->flag_l = true;
+					else if (av[i][j] == flag[2])
+						flags->flag_R = true;
 					else {
 						mx_printerr("uls: illegal option -- ");
-						mx_printerr(&av[i][j]);
+						char c = av[i][j];
+						mx_printerr(&c);
 						mx_printerr("\nusage: ls [-Aal] [file ...]\n");
 						exit(1);
 					}
@@ -122,11 +126,9 @@ void mx_basic_print(char **files_in_dir, int count, int max_len) {
 	}
 }
 
-
-void mx_current_directory(t_flag *flags, char *dir_name) {
+int mx_count_elem_in_dir(t_flag *flags, char *dir_name) {
 	DIR *dir = opendir(dir_name);
 	struct dirent *entry;
-	char **files_in_dir;
 	int count = 0;
 
 	while ((entry = readdir(dir)) != NULL) {
@@ -140,11 +142,43 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 			count++;
 	}
 	closedir(dir);
+	return count;
+}
 
+// char *mx_substr(const char *src, int a, int b) {
+//   	int len = b - a;
+//   	char *dst = (char *)malloc(sizeof(char) * (len + 1));
+  	
+//   	for (int i = a; i < b && src[i] != '\0'; i++) {
+//   	  	*dst = src[i];
+//   	  	dst++;
+//   	}
+//   	*dst = '\0';
+//   	return dst - len;
+// }
+
+// void *mx_name_of_dir(char *s, int c) {
+// 	unsigned char *ptr = (unsigned char *)s + mx_strlen(s);
+
+// 	while (ptr) {
+// 		if (*ptr == (unsigned char)c)
+// 			return ptr;
+// 		ptr--;
+// 	}
+// 	return NULL;
+// }
+
+
+char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count) {
+	DIR *dir = opendir(dir_name);
+	struct dirent *entry;
+	char **files_in_dir = (char **)malloc(sizeof(char *) * (count + 1));
 	int i = 0;
-	dir = opendir(dir_name);
-	files_in_dir = (char **)malloc(sizeof(char *) * (count + 1));
+	
+	// if (dir = NULL) {
 
+	//  	perror(заспилтованная папочка) //ошибка Permission denied
+	// }
 	while ((entry = readdir(dir)) != NULL) {
 		if (flags->flag_a == true)
 			files_in_dir[i++] = mx_strdup(entry->d_name);
@@ -157,12 +191,32 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 	}
 	files_in_dir[i] = NULL;
 	closedir(dir);
+	return files_in_dir;
+}
+
+
+void mx_current_directory(t_flag *flags, char *dir_name) {
+	int count = mx_count_elem_in_dir(flags, dir_name);
+	char **files_in_dir = mx_make_mas_of_elem_in_dir(flags, dir_name, count);
+
+
+	
 	mx_bubble_sort(files_in_dir, count);
+
+
 	int max_len = mx_count_max_len(files_in_dir);
 	mx_basic_print(files_in_dir, count, max_len);
 }
 
-void mx_files_and_dir(char **file, t_flag *flags) {
+
+// void mx_call_recursion(char **dirs, int dir_count, t_flag *flags) {
+// 	if (flags->flag_R == true)  {
+// 		mx_recusion_flag(dirs, dir_count, flags);
+// 	}
+// }
+
+
+void mx_files_and_dir(char **file, t_flag *flags, int ac) {
 	struct stat buf;
 	int dir_count = 0;
 	int file_count = 0;
@@ -206,17 +260,23 @@ void mx_files_and_dir(char **file, t_flag *flags) {
 	
 	mx_bubble_sort(dirs, dir_count);
 	
-	if (file_count != 0)
-		mx_printstr("\n");
-	for (int j = 0; dirs[j]; j++) {
-		if (dir_count != 1) {
-			mx_printstr(dirs[j]);
-			mx_printchar(':');
+	if (flags->flag_R) {
+		mx_recursion_flag(dirs, dir_count, flags);
+	}
+	
+	else {
+		if (file_count != 0)
 			mx_printstr("\n");
+		for (int j = 0; dirs[j]; j++) {
+			if (ac != 2) {
+				mx_printstr(dirs[j]);
+				mx_printchar(':');
+				mx_printstr("\n");
+			}
+			mx_current_directory(flags, dirs[j]);
+			if (j != dir_count - 1)
+				mx_printstr("\n");
 		}
-		mx_current_directory(flags, dirs[j]);
-		if (j != dir_count - 1)
-			mx_printstr("\n");
 	}
 }
 
@@ -225,11 +285,12 @@ int main(int ac, char **av)
 	t_flag *flags = (t_flag *)malloc(sizeof(t_flag));
 	char **file = NULL;
 	mx_memset(flags, 0, sizeof(t_flag));
-	file = mx_valid_flag(ac, av, flags);
-	
-	if (file[0] == NULL)
+	file = mx_valid_flag(ac, av, flags); //files in argument
+	if (file[0] == NULL) {
 		mx_current_directory(flags, ".");
-	else 
-		mx_files_and_dir(file, flags);
+	}
+	else {
+		mx_files_and_dir(file, flags, ac);
+	}
 	return 0;
 }
