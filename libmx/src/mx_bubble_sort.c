@@ -6,16 +6,18 @@ int mx_bubble_sort(char **arr, int size) {
 	int count = 0;
 	int i = 0;
 
-	while (i < size) {
-		if (mx_strcmp(arr[i], arr[i + 1]) > 0) {
-			swap(&arr[i], &arr[i + 1]);		
-			count++;
+	if (size > 1) {
+		while (i < size) {
+			if (mx_strcmp(arr[i], arr[i + 1]) > 0) {
+				swap(&arr[i], &arr[i + 1]);		
+				count++;
+			}
+			i++;
+			if (i == size - 1) {
+				i = 0;
+				size--;
+			} 
 		}
-		i++;
-		if (i == size - 1) {
-			i = 0;
-			size--;
-		} 
 	}
 	return count;
 }

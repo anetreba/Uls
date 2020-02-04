@@ -20,7 +20,7 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 					else {
 						mx_printerr("uls: illegal option -- ");
 						mx_printerr(&av[i][j]);
-						mx_printerr("\nusage: ls [-Aal] [file ...]");
+						mx_printerr("\nusage: ls [-Aal] [file ...]\n");
 						exit(1);
 					}
 				}
@@ -36,7 +36,6 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 			count_files++;
 		}
 	}
-	// printf("COUNT FILES = %d\n", count_files);
 
 	flag_priority = true;
 	file = (char **)malloc(sizeof(char *) * (count_files + 1));
@@ -178,13 +177,9 @@ void mx_files_and_dir(char **file, t_flag *flags) {
 		else {
 			mx_printerr("uls: ");
 			mx_printerr(file[i]);
-			mx_printerr(": No such file or directory");
-			exit(1);
+			mx_printerr(": No such file or directory\n");
 		}
 	}
-
-	// printf("FILES COUNT = %d\n", file_count);
-	// printf("DIR COUNT= %d\n", dir_count);
 
 	char **files = (char **)malloc(sizeof(char *) * (file_count + 1));
 	char **dirs = (char **)malloc(sizeof(char *) * (dir_count + 1));
@@ -202,18 +197,26 @@ void mx_files_and_dir(char **file, t_flag *flags) {
 	files[file_count] = NULL;
 	dirs[dir_count] = NULL;
 
-	mx_bubble_sort(files, file_count);
-	int max_len = mx_count_max_len(files);
-	mx_basic_print(files, file_count, max_len);
+	if (file_count > 0) {
+		mx_bubble_sort(files, file_count);
+		int max_len = mx_count_max_len(files);
+		mx_basic_print(files, file_count, max_len);
+	}
 
+	
 	mx_bubble_sort(dirs, dir_count);
+	
+	if (file_count != 0)
+		mx_printstr("\n");
 	for (int j = 0; dirs[j]; j++) {
-		mx_printstr(dirs[j]);
-		mx_printchar(':');
-		mx_printstr("\n");
+		if (dir_count != 1) {
+			mx_printstr(dirs[j]);
+			mx_printchar(':');
+			mx_printstr("\n");
+		}
 		mx_current_directory(flags, dirs[j]);
-		mx_printstr("\n");
-		printf("suka\n");
+		if (j != dir_count - 1)
+			mx_printstr("\n");
 	}
 }
 
@@ -223,13 +226,10 @@ int main(int ac, char **av)
 	char **file = NULL;
 	mx_memset(flags, 0, sizeof(t_flag));
 	file = mx_valid_flag(ac, av, flags);
-	// for (int i = 0; file[i]; i++)
-	// 	printf("FILE = %s ", file[i]);
-	// printf("\n");
+	
 	if (file[0] == NULL)
 		mx_current_directory(flags, ".");
-	else {
+	else 
 		mx_files_and_dir(file, flags);
-	}
 	return 0;
 }
