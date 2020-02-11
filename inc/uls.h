@@ -30,7 +30,7 @@ int mx_dir_count(char **files_in_dir);
 char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count);
 char **mx_make_path(char **dirs_in, char *dir_name, int dir_count);
 void mx_print_recursion(char **files_in_dir, int count);
-char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count);
+char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k);
 void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags);
 char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
 int mx_count_elem_in_dir(t_flag *flags, char *dir_name);

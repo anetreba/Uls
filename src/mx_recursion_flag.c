@@ -6,10 +6,13 @@ int mx_dir_count(char **files_in_dir) {
 	int dir_count = 0;
 
 	for (int i = 0; files_in_dir[i]; i++) {
-		if (lstat(files_in_dir[i], &buf) >= 0) {
-     		if (((buf.st_mode & S_IFDIR) == S_IFDIR))
-                    dir_count += 1;
-		}
+		// if (mx_strcmp(files_in_dir[i], ".") != 0 
+		// 		&& mx_strcmp(files_in_dir[i], "..") != 0) {
+			if (lstat(files_in_dir[i], &buf) >= 0) {
+    	 		if (((buf.st_mode & S_IFDIR) == S_IFDIR))
+    	                dir_count += 1;
+			}
+		//}
 	}
 	return dir_count;
 }
@@ -21,11 +24,14 @@ char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count) {
 	if (*files_in_dir != NULL) {
 		char **dirs = (char **)malloc(sizeof(char *) * (dir_count + 1));
 		for (int j = 0; j < count; j++) {
-			if (lstat(files_in_dir[j], &buf) >= 0) {
-				if (((buf.st_mode & S_IFDIR) == S_IFDIR)) 
-					dirs[k++] = mx_strdup(files_in_dir[j]);
+			// if (mx_strcmp(files_in_dir[j], ".") != 0 
+			// 	&& mx_strcmp(files_in_dir[j], "..") != 0) {
+				if (lstat(files_in_dir[j], &buf) >= 0) {
+					if (((buf.st_mode & S_IFDIR) == S_IFDIR)) 
+						dirs[k++] = mx_strdup(files_in_dir[j]);
+				}
 			}
-		}
+		//}
 		dirs[dir_count] = NULL;
 		//mx_del_strarr(&files_in_dir);
 		return dirs;
@@ -38,22 +44,20 @@ char **mx_make_path(char **dirs_in, char *dir_name, int dir_count) {
 	char **path = (char **)malloc(sizeof(char *) * (dir_count + 1));
 	char *tmp = NULL;
 
-	for (int i = 0; dirs_in[i]; i++) {
-		if (mx_strcmp(dir_name, "/") == 0)
-        	tmp = mx_strdup(dir_name);
-    	else
-        	tmp = mx_strjoin(dir_name, "/");
-		path[i] = mx_strjoin(tmp, dirs_in[i]);
-		//printf("TMP == %s\n", tmp);
-		//tmp = NULL;
-		// if (i == 1)
-		//free(tmp);
+	if (mx_strcmp(dir_name, "..") != 0) {
+		for (int i = 0; dirs_in[i]; i++) {
+			//if (mx_strcmp(dirs_in[i], ".") != 0 && mx_strcmp(dirs_in[i], "..") != 0) {
+				if (mx_strcmp(dir_name, "/") == 0)
+    	    		tmp = mx_strdup(dir_name);
+    			else
+    	    		tmp = mx_strjoin(dir_name, "/");
+				path[i] = mx_strjoin(tmp, dirs_in[i]);
+				if (tmp != NULL)
+					free(tmp);
+			//}
+		}
+		path[dir_count] = NULL;
 	}
-	//system("leaks uls");
-	// for (int i = 0; path[i]; i++)
-	// 	printf("PATH  =  %s,", path[i]);
-	// printf("\n");
-		//system("leaks -q uls");
 	return path;
 }
 
@@ -66,28 +70,27 @@ void mx_print_recursion(char **files_in_dir, int count) {
 }
 
 
-char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count) {
+char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
 	int count = mx_count_elem_in_dir(flags, dir_name);
 	char **path = NULL;
 	char **dirs_in = NULL;
-	//mx_del_strarr(&path);
 	if (count != 0) {
 		char **files_in_dir = mx_make_mas_of_elem_in_dir(flags, dir_name, count);
-		mx_printstr(dir_name);
-		mx_printstr(":\n");		
+		
+		if (*k) {
+			mx_printstr("\n");
+			mx_printstr(dir_name);
+			mx_printstr(":\n");
+		}
+		*k = true;
 		mx_print_recursion(files_in_dir, count);
-		mx_printstr("\n");
 		path = mx_make_path(files_in_dir, dir_name, count);
 		*dir_count = mx_dir_count(path);
 		if (*dir_count != 0)
 			dirs_in = mx_make_mas_of_dirs(*dir_count, path, count);
-		// if (path && *path) {
-		//	mx_del_strarr(&path);
-		// }
-		// if (vslutiak == 0) {
-		// 	mx_del_strarr(&files_in_dir);
-		// 	vslutiak++;
-		// }
+
+		mx_del_strarr(&files_in_dir);
+		mx_del_strarr(&path);
 
 		return dirs_in; 
 	}
@@ -98,20 +101,18 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count) {
 
 void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags) {
 	char **dirs_in = NULL;
-	//static int k = 0;
+	static bool k = false;
 	int dir_count_in = 0;
 	dir_count = 0;
-	// printf("<<<%d\n", dir_count);
 
 	for (int i = 0; dirs[i]; i++) {
-		dirs_in = mx_dir_in(flags, dirs[i], &dir_count_in);
-	// 	printf(">>>%s\n", dirs[i]);
-	// 	printf("<<<%s\n", dirs_in[i]);
-	// printf("<%d>\n", errno);
-	// 	if (++k == 5)
-	// 		exit(1);
+		dirs_in = mx_dir_in(flags, dirs[i], &dir_count_in, &k);
 		if (dirs_in != NULL) {
 			mx_recursion_flag(dirs_in, dir_count_in, flags);
+
+			mx_del_strarr(&dirs_in);
 		}
 	}
+	system("leaks uls");
+
 }
