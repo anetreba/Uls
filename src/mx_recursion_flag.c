@@ -40,33 +40,49 @@ char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count) {
 }
 
 
-char **mx_make_path(char **dirs_in, char *dir_name, int dir_count) {
+
+char **mx_make_path(char **dirs_in, char *dir_name, int dir_count, t_flag *flags) {
+	if (flags->flag_a)
+		dir_count -= 2;
 	char **path = (char **)malloc(sizeof(char *) * (dir_count + 1));
 	char *tmp = NULL;
+	int j = 0;
 
-	if (mx_strcmp(dir_name, "..") != 0) {
+	if (mx_strcmp(dir_name, "..") != 0 /*|| mx_strcmp(dir_name, ".") != 0*/) {
+		// printf("len == %d\n", mx_strlen(dir_name));
+
 		for (int i = 0; dirs_in[i]; i++) {
-			//if (mx_strcmp(dirs_in[i], ".") != 0 && mx_strcmp(dirs_in[i], "..") != 0) {
+			if (mx_strcmp(dirs_in[i], ".") != 0 && mx_strcmp(dirs_in[i], "..") != 0) {
+				// printf("dirs_name == %s\n", dirs_in[i]);
+			// if (mx_strcmp((mx_memrchr(dirs_in[i], '/', mx_strlen(dirs_in[i]))), "/.") != 0 
+			// 	|| mx_strcmp((mx_memrchr(dirs_in[i], '/', mx_strlen(dirs_in[i]))), "/..") != 0) {
+				// if (path[i + 1] != '.'){
 				if (mx_strcmp(dir_name, "/") == 0)
     	    		tmp = mx_strdup(dir_name);
     			else
     	    		tmp = mx_strjoin(dir_name, "/");
-				path[i] = mx_strjoin(tmp, dirs_in[i]);
+				path[j] = mx_strjoin(tmp, dirs_in[i]);
+				j++;
 				if (tmp != NULL)
 					free(tmp);
-			//}
+			}
 		}
-		path[dir_count] = NULL;
 	}
+	path[dir_count] = NULL;
 	return path;
 }
 
-void mx_print_recursion(char **files_in_dir, int count) {
+void mx_print_recursion(char **files_in_dir, int count, t_flag *flags) {
 
 	mx_bubble_sort(files_in_dir, count);
-	int max_len = mx_count_max_len(files_in_dir);		
-	mx_basic_print(files_in_dir, count, max_len);
-
+	if (flags->flag_m) {
+		mx_flag_m(files_in_dir, count);
+		mx_printstr("\n");
+	}
+	else {
+		int max_len = mx_count_max_len(files_in_dir);		
+		mx_basic_print(files_in_dir, count, max_len);
+	}
 }
 
 
@@ -83,8 +99,8 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
 			mx_printstr(":\n");
 		}
 		*k = true;
-		mx_print_recursion(files_in_dir, count);
-		path = mx_make_path(files_in_dir, dir_name, count);
+		mx_print_recursion(files_in_dir, count, flags);
+		path = mx_make_path(files_in_dir, dir_name, count, flags);
 		*dir_count = mx_dir_count(path);
 		if (*dir_count != 0)
 			dirs_in = mx_make_mas_of_dirs(*dir_count, path, count);
@@ -113,6 +129,6 @@ void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags) {
 			mx_del_strarr(&dirs_in);
 		}
 	}
-	system("leaks uls");
+	//system("leaks uls");
 
 }

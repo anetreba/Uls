@@ -83,7 +83,7 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 	}
 	if (flags->flag_R) {
 		mx_printchar('\n');
-		char **path = mx_make_path(files_in_dir, dir_name, count);
+		char **path = mx_make_path(files_in_dir, dir_name, count, flags);
 		int dir_count = mx_dir_count(path);
 		char **dirs_in = mx_make_mas_of_dirs(dir_count, path, count);
 		mx_recursion_flag(dirs_in, dir_count, flags);
