@@ -24,7 +24,23 @@ typedef struct s_flag {
 	bool flag_A;
 	bool flag_R;
 	bool flag_m;
+	bool flag_1;
+	bool flag_S;
+	bool flag_t;
+	bool flag_u;
+	bool flag_c;
+	bool flag_r;
+	bool flag_G;
 }				t_flag;
+
+typedef struct s_sort {
+    char *name;
+
+    long long size;
+    long long time_modefied;
+    long long time_access;
+    long long time_changed;
+}               t_sort;
 
 int mx_dir_count(char **files_in_dir);
 char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count);
@@ -46,14 +62,15 @@ void mx_basic_print(char **files_in_dir, int count, int max_len);
 char **mx_valid_flag(int ac, char **av, t_flag *flags);
 
 void mx_flag_m(char **files_in_dir, int count);
-
+void mx_flag_1(char **files_in_dir, int count);
 
 void *mx_name_of_dir(char *s, int c);
 int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
 char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
 void mx_current_directory(t_flag *flags, char *dir_name);
 
-
-
+void mx_sort_S(char **files, int dir_count, char *file_name, t_flag *flags);
+void mx_sort_t(char **files, int dir_count, char *file_name, t_flag *flags);
+void mx_sort_r(char **files, int count);
 
 #endif

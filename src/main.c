@@ -43,8 +43,21 @@ void mx_files_and_dir(char **file, t_flag *flags, int ac) {
 				mx_printstr("\n");
 			}
 		}
+		else if (flags->flag_1)
+			mx_flag_1(files, file_count);
 		else {
 			mx_bubble_sort(files, file_count);
+			
+			if (flags->flag_S)
+				mx_sort_S(files, file_count, NULL, flags);
+			// else if (flags->flag_u && flags->flag_t)
+			// 	mx_sort_u(files, file_count, NULL, flags);		
+			else if (flags->flag_t)
+				mx_sort_t(files, file_count, NULL, flags);
+
+			if (flags->flag_r)
+				mx_sort_r(files, file_count);
+
 			int max_len = mx_count_max_len(files);
 			mx_basic_print(files, file_count, max_len);
 		}
@@ -53,7 +66,17 @@ void mx_files_and_dir(char **file, t_flag *flags, int ac) {
 	mx_del_strarr(&files);
 	
 	mx_bubble_sort(dirs, dir_count);
+
+	if (flags->flag_S)
+		mx_sort_S(dirs, dir_count, NULL, flags);
+	// else if (flags->flag_u && flags->flag_t)
+	// 	mx_sort_u(dirs, dir_count, NULL, flags);
+	else if (flags->flag_t)
+		mx_sort_t(dirs, dir_count, NULL, flags);
 	
+	if (flags->flag_r)
+		mx_sort_r(dirs, dir_count);
+
 	if (flags->flag_R) {
 		mx_recursion_flag(dirs, dir_count, flags);
 	}
