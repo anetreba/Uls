@@ -2,7 +2,7 @@
 #define ULS_H
 
 #include "libmx/inc/libmx.h"
-
+#include <sys/types.h> // хз можно ли юзать :(
 #include <errno.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -34,6 +34,7 @@ typedef struct s_flag {
 	bool flag_G;
 	bool flag_F;
 	bool flag_p;
+	//bool flag_sobaka; // dopilit'
 }				t_flag;
 
 typedef struct s_sort {

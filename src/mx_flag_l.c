@@ -8,19 +8,15 @@ void mx_bzero(void *s, size_t size) {
 }
 
 void mx_print_spaces(int n) {
-    while (n > 0) {
+    for (; n > 0; n--)
         mx_printchar(' ');
-        n--;
-    }
 }
 
 int mx_intlen(long long n) {
     int i = 1;
 
-    while (n > 9) {
+    for (; n > 9; i++)
         n /= 10;
-        i++;
-    }
     return i;
 }
 
@@ -34,19 +30,19 @@ char *mx_mychmod(int mode, char *str, char *dir_mame) {
     mx_strcpy(str,"-----------");
     acl = acl_get_link_np(dir_mame, 256);
     xattr = listxattr(dir_mame, buf, 0, XATTR_NOFOLLOW);
-    if(S_ISDIR(mode))str[0]='d';
-    if(S_ISCHR(mode))str[0]='c';
-    if(S_ISBLK(mode))str[0]='b';
-    if(S_ISLNK(mode))str[0]= 'l';
-    if(mode & S_IRUSR)str[1]='r';
-    if(mode & S_IWUSR)str[2]='w';
-    if(mode & S_IXUSR)str[3]='x';
-    if(mode & S_IRGRP)str[4]='r';
-    if(mode & S_IWGRP)str[5]='w';
-    if(mode & S_IXGRP)str[6]='x';
-    if(mode & S_IROTH)str[7]='r';
-    if(mode & S_IWOTH)str[8]='w';
-    if(mode & S_IXOTH)str[9]='x';
+    if (S_ISDIR(mode))str[0] = 'd';
+    if (S_ISCHR(mode))str[0] = 'c';
+    if (S_ISBLK(mode))str[0] = 'b';
+    if (S_ISLNK(mode))str[0] =  'l';
+    if (mode & S_IRUSR)str[1] = 'r';
+    if (mode & S_IWUSR)str[2] = 'w';
+    if (mode & S_IXUSR)str[3] = 'x';
+    if (mode & S_IRGRP)str[4] = 'r';
+    if (mode & S_IWGRP)str[5] = 'w';
+    if (mode & S_IXGRP)str[6] = 'x';
+    if (mode & S_IROTH)str[7] = 'r';
+    if (mode & S_IWOTH)str[8] = 'w';
+    if (mode & S_IXOTH)str[9] = 'x';
     if (xattr > 0)
         str[10] = '@';
     else
@@ -149,18 +145,15 @@ void total_blocks(char **files_in_dir, t_len_column *lens, char *dir_name, int c
 
     mx_memset(lens, 0, sizeof(t_len_column));
     path = mx_find_path1(files_in_dir, dir_name, count, flags);
-
-        // printf("%s <<<<<<<<<<<<<<<<<\n\n", path[0]);
     for (int i = 0; path[i]; i++) {
-        // printf("%s\n", path[i]);
-        if (dir_name != NULL)
-            lstat(path[i], &buff);
+        if (dir_name != NULL) 
+            lstat(path[i], &buff); 
         else
-            lstat(files_in_dir[i], &buff); 
+            lstat(files_in_dir[i], &buff);
         filling_struct(lens, buff);
        	total += buff.st_blocks;
 
-    } 
+    }
     mx_printstr("total ");
     mx_printint(total);
     mx_printchar('\n');
@@ -205,6 +198,16 @@ static void mx_itoa_to_string(unsigned int number, int n) {
 	free(str);
 }
 
+// char *time_T(time_t time /*, t_flag *fags*/) { //                     функцию ниже добавишь
+//     char *str;
+//     time_t sec = time(NULL);
+//     if (flag_T)
+//         str = mx_substr(ctime(&(time)), 4, 24);
+//     else
+//        str = mx_substr(ctime(&(time)), 4, 16);
+//     return str;
+// }
+
 void my_time(char *filename, t_flag *flags) {
     struct stat *file_info = malloc(sizeof(struct stat));
     char *sub;
@@ -230,7 +233,7 @@ void my_time(char *filename, t_flag *flags) {
     	free(file_info);
     }
     else {
-    	sub = mx_substr(ctime(&(time)), 4, 16);
+    	sub = mx_substr(ctime(&(time)), 4, 16);//                                 <- time_T(time);
     	mx_printstr(sub);
     	mx_print_spaces(1);
     	free(file_info);
@@ -239,7 +242,7 @@ void my_time(char *filename, t_flag *flags) {
 }
 
 void my_readlink(char *str, char *filename) {
-    char ayaya[1024]; // <3 twitch
+    char ayaya[1024];
 
     if (str[0] == 'l') {
         readlink(filename, ayaya, 1024);
@@ -252,14 +255,33 @@ void my_readlink(char *str, char *filename) {
     }
 }
 
+// void mx_flag_sobaka(char *str, char *filename/*, t_flag *flags */) { // <<<<<подключишь флажок
+//     char pog_champ[1024];
+//     size_t size_xat = 0;
+//     if (str[10] == '@'/* && flags->flag_sobaka */) {
+//         if (listxattr(filename, pog_champ, 1024, 1) >= 0)
+//         size_xat = getxattr(filename, pog_champ, 0, 1024, 0, 1);
+//         mx_printchar('\n');
+//         mx_print_spaces(8);
+//         mx_printstr(pog_champ);
+//         mx_print_spaces(6);
+//         mx_printint(size_xat);
+//     }
+// }
+
+// void flag_h(long long n, t_flag *flags) {   //                       не успел доделать
+//     if (flags->flag_h) {
+//         n /= 1024;
+//         str = mx_itoa(n);
+//     }
+// }
+
 void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
     char pr_dost[12];
-    // char ayaya[1024]; // <3 twitch
     struct stat buff;
     t_len_column *lens = (t_len_column *)malloc(sizeof(t_len_column));
     t_diff_len *l = (t_diff_len *)malloc(sizeof(t_diff_len));
     char **path = NULL;
-
 
     path = mx_find_path1(files_in_dir, dir_name, count, flags);
     total_blocks(files_in_dir, lens, dir_name, count, flags);
@@ -275,21 +297,8 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
         my_time(path[i], flags);
         mx_printstr(files_in_dir[i]);
         my_readlink(pr_dost, path[i]);
-        // if (pr_dost[0] == 'l')
-        //     readlink(path[i], ayaya, 1024);
-        // if (ayaya[0] != '\0') {
-        //     mx_printstr(" -> ");
-        //     mx_printstr(ayaya);
-        // }
+        // mx_flag_sobaka(pr_dost, path[i]);
         mx_printchar('\n');
-        // mx_bzero(ayaya, sizeof(ayaya));
-        // ayaya[0] = '\0';
-        // bzero(lin, sizeof(lin));
     }
-        // printf("size link %d\n", lens->len_link);
-        // printf("size size %d\n", lens->len_size);
-        // printf("size user %d\n", lens->len_user);
-        // printf("size gid  %d || ",lens->len_gid);
-        // printf("diff gid  %d\n",l->diff_gid);
     // system("leaks uls");
 }
