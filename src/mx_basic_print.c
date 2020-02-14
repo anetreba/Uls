@@ -31,6 +31,7 @@ void mx_choose_print_action(char *files_in_dir) {
 	// *files_in_dir = *files_in_dir;
 	// printf("la\n");
 	mx_printstr(files_in_dir);
+
 }
 
 void basic_tab_print(int arg_len, int max_len) {

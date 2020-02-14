@@ -10,6 +10,7 @@ SRC = main.c \
 	mx_elem_in_dir.c \
 	mx_sort_flags.c \
 	mx_flag_G.c \
+	mx_flag_l.c \
 
 OBJ = main.o \
 	mx_recursion_flag.o \
@@ -19,6 +20,7 @@ OBJ = main.o \
 	mx_elem_in_dir.o \
 	mx_sort_flags.o \
 	mx_flag_G.o \
+	mx_flag_l.o \
 
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic

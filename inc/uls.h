@@ -16,6 +16,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <errno.h>
+#include <err.h>
 
 
 typedef struct s_flag {
@@ -31,6 +32,8 @@ typedef struct s_flag {
 	bool flag_c;
 	bool flag_r;
 	bool flag_G;
+	bool flag_F;
+	bool flag_p;
 }				t_flag;
 
 typedef struct s_sort {
@@ -42,10 +45,28 @@ typedef struct s_sort {
     long long time_changed;
 }               t_sort;
 
+typedef struct s_len_column {
+	int len_prav;
+	int	len_link;
+	int len_user;
+	int len_gid;
+	int len_size;
+	int len_time;
+}				t_len_column;
+
+typedef struct s_diff_len {
+	// int diff_prav;
+	int	diff_link;
+	int diff_user;
+	int diff_gid;
+	int diff_size;
+	// int diff_time;
+}				t_diff_len;
+
 int mx_dir_count(char **files_in_dir);
 char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count);
 char **mx_make_path(char **dirs_in, char *dir_name, int dir_count, t_flag *flags);
-void mx_print_recursion(char **files_in_dir, int count, t_flag *flags);
+void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir_name);
 char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k);
 void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags);
 char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
@@ -63,6 +84,8 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags);
 
 void mx_flag_m(char **files_in_dir, int count);
 void mx_flag_1(char **files_in_dir, int count);
+void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags);
+void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags);
 
 void *mx_name_of_dir(char *s, int c);
 int mx_count_elem_in_dir(t_flag *flags, char *dir_name);

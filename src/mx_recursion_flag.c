@@ -59,13 +59,17 @@ char **mx_make_path(char **dirs_in, char *dir_name, int dir_count, t_flag *flags
 	return path;
 }
 
-void mx_print_recursion(char **files_in_dir, int count, t_flag *flags) {
+void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir_name) {
 
 	mx_bubble_sort(files_in_dir, count);
 	if (flags->flag_m) {
 		mx_flag_m(files_in_dir, count);
 		mx_printstr("\n");
 	}
+	else if (flags->flag_1)
+		mx_flag_1(files_in_dir, count);
+	else if (flags->flag_G || flags->flag_F || flags->flag_p)
+		mx_flag_G(files_in_dir, count, dir_name, flags);
 	else {
 		int max_len = mx_count_max_len(files_in_dir);		
 		mx_basic_print(files_in_dir, count, max_len);
@@ -86,7 +90,7 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
 			mx_printstr(":\n");
 		}
 		*k = true;
-		mx_print_recursion(files_in_dir, count, flags);
+		mx_print_recursion(files_in_dir, count, flags, dir_name);
 		path = mx_make_path(files_in_dir, dir_name, count, flags);
 		*dir_count = mx_dir_count(path);
 		if (*dir_count != 0)

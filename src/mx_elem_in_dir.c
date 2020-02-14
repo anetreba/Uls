@@ -88,6 +88,10 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 	else if (flags->flag_1) {
 		mx_flag_1(files_in_dir, count);
 	}
+	else if (flags->flag_G)
+		mx_flag_G(files_in_dir, count, dir_name, flags);
+	else if (flags->flag_l)
+		mx_flag_l(files_in_dir, count, dir_name, flags);
 	else {
 		int max_len = mx_count_max_len(files_in_dir);
 		mx_basic_print(files_in_dir, count, max_len);

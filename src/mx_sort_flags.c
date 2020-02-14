@@ -53,8 +53,9 @@ void mx_dell_stuct(t_sort **info_file, int dir_count) {
 void mx_sort_S(char **files, int dir_count, char *file_name, t_flag *flags) {
 	int i = 0;
 	int size = dir_count;
-	t_sort *info_file = mx_pasre_struct(files, file_name, dir_count, flags);
-
+	if (size > 1) {
+		t_sort *info_file = mx_pasre_struct(files, file_name, dir_count, flags);
+	
 		while (i < size) {
 			if (info_file[i].size < info_file[i + 1].size) {
 				swap(&files[i], &files[i + 1]);
@@ -66,34 +67,38 @@ void mx_sort_S(char **files, int dir_count, char *file_name, t_flag *flags) {
 				size--;
 			} 
 		}
-	mx_dell_stuct(&info_file, dir_count);
+		mx_dell_stuct(&info_file, dir_count);
+	}
 }
 
 void mx_sort_t(char **files, int dir_count, char *file_name, t_flag *flags) {
 	int i = 0;
 	int size = dir_count;
-	t_sort *info_file = mx_pasre_struct(files, file_name, dir_count, flags);
-
-	while (i < size) {
-		if ((info_file[i].time_access < info_file[i + 1].time_access) && flags->flag_u) {
-			swap(&files[i], &files[i + 1]);
-			mx_swap_struct(&info_file[i], &info_file[i + 1]);
+	if (size > 1) {
+	
+		t_sort *info_file = mx_pasre_struct(files, file_name, dir_count, flags);
+	
+		while (i < size) {
+			if ((info_file[i].time_access < info_file[i + 1].time_access) && flags->flag_u) {
+				swap(&files[i], &files[i + 1]);
+				mx_swap_struct(&info_file[i], &info_file[i + 1]);
+			}
+			else if ((info_file[i].time_changed < info_file[i + 1].time_changed) && flags->flag_c) {
+				swap(&files[i], &files[i + 1]);
+				mx_swap_struct(&info_file[i], &info_file[i + 1]);
+			}
+			else if ((info_file[i].time_modefied < info_file[i + 1].time_modefied)) {
+				swap(&files[i], &files[i + 1]);
+				mx_swap_struct(&info_file[i], &info_file[i + 1]);		
+			}
+			i++;
+			if (i == size - 1) {
+				i = 0;
+				size--;
+			} 
 		}
-		else if ((info_file[i].time_changed < info_file[i + 1].time_changed) && flags->flag_c) {
-			swap(&files[i], &files[i + 1]);
-			mx_swap_struct(&info_file[i], &info_file[i + 1]);
-		}
-		else if ((info_file[i].time_modefied < info_file[i + 1].time_modefied)) {
-			swap(&files[i], &files[i + 1]);
-			mx_swap_struct(&info_file[i], &info_file[i + 1]);		
-		}
-		i++;
-		if (i == size - 1) {
-			i = 0;
-			size--;
-		} 
+		mx_dell_stuct(&info_file, dir_count);
 	}
-	mx_dell_stuct(&info_file, dir_count);
 }
 
 void mx_sort_r(char **files, int count) {
