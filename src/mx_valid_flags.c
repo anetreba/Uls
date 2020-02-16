@@ -30,11 +30,17 @@ void mx_struct_flag(char *av, t_flag *flags, char *flag) {
 			flags->flag_p = true;
 		else if (av[j] == flag[13])
 			flags->flag_F = true;
+		else if (av[j] == flag[14])
+			flags->flag_T = true;
+		else if (av[j] == flag[15])
+			flags->flag_sobaka = true;
+		else if (av[j] == flag[16])
+			flags->flag_f = true;
 		else {
 			mx_printerr("uls: illegal option -- ");
 			char c = av[j];
 			mx_printerr(&c);
-			mx_printerr("\nusage: uls [-ARFGSaclmprtu1] [file ...]\n");
+			mx_printerr("\nusage: uls [-ARFGSTacflmprtu1] [file ...]\n");
 			exit(1);
 		}
 	}
@@ -65,7 +71,7 @@ char **mx_create_file(char **av, int ac, int count_files, char **file) {
 }
 
 char **mx_valid_flag(int ac, char **av, t_flag *flags) {
-	char flag[] = "AaRlmS1tucrGpF";
+	char flag[] = "AaRlmS1tucrGpFT@f";
 	bool flag_priority = true;
 	int count_files = 0;
 	char **file = NULL;

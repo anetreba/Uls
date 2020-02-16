@@ -66,6 +66,8 @@ void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir
 		mx_flag_m(files_in_dir, count);
 		mx_printstr("\n");
 	}
+	else if (flags->flag_l)
+		mx_flag_l(files_in_dir, count, dir_name, flags);
 	else if (flags->flag_1)
 		mx_flag_1(files_in_dir, count);
 	else if (flags->flag_G || flags->flag_F || flags->flag_p)

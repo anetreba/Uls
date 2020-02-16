@@ -34,7 +34,9 @@ typedef struct s_flag {
 	bool flag_G;
 	bool flag_F;
 	bool flag_p;
-	//bool flag_sobaka; // dopilit'
+	bool flag_T;
+	bool flag_sobaka; // dopilit'
+	bool flag_f;
 }				t_flag;
 
 typedef struct s_sort {

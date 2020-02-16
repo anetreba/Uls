@@ -4,8 +4,9 @@ char *mx_find_path(char *file, char *file_name) {
     char *filepath1 = NULL;
     char *filepath2 = NULL;
 
-    if (mx_strcmp(file_name, ".") == 0)
+    if (file_name == NULL){
         return file;
+    }
     filepath1 = mx_strjoin(file_name, "/");
     filepath2 = mx_strjoin(filepath1, file);
     mx_strdel(&filepath1);
@@ -92,7 +93,7 @@ char mx_file_mode_check(char *file, char *file_name) {
     c = one_mode_unit(buf);
     if (c == '-')
         c = second_mode_unit(buf);
-    if (mx_strcmp(file_name, ".") != 0)
+    if (file_name != NULL)
         mx_strdel(&filepath);
     return c;
 }
@@ -127,6 +128,7 @@ static void color_mode_one(char c) {
 
 void mx_colour_out(char *file, char *file_name) {
     char c = mx_file_mode_check(file, file_name);
+//for (int i = 0; files_in_dir[i]; i++)
     int size = mx_strlen(file);
 
     write(1, "\33[0m", mx_strlen("\33[0m"));

@@ -23,7 +23,7 @@ int mx_count_elem_in_dir(t_flag *flags, char *dir_name) {
 	}
 	else {
 		while ((entry = readdir(dir)) != NULL) {
-			if (flags->flag_a == true)
+			if (flags->flag_a == true || flags->flag_f)
 				count++;
 			else if (flags->flag_A == true) {
 				if (entry->d_name[1] != '.' && entry->d_name[1] != '\0')
@@ -48,7 +48,7 @@ char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count) {
 	else {
 		char **files_in_dir = (char **)malloc(sizeof(char *) * (count + 1));
 		while ((entry = readdir(dir)) != NULL) {
-			if (flags->flag_a == true)
+			if (flags->flag_a == true || flags->flag_f)
 				files_in_dir[i++] = mx_strdup(entry->d_name);
 			else if (flags->flag_A == true) {
 				if (entry->d_name[1] != '.' && entry->d_name[1] != '\0')
@@ -69,18 +69,17 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 	int count = mx_count_elem_in_dir(flags, dir_name);
 	char **files_in_dir = mx_make_mas_of_elem_in_dir(flags, dir_name, count);
 
-	mx_bubble_sort(files_in_dir, count);
-
-	if (flags->flag_S)
-		mx_sort_S(files_in_dir, count, dir_name, flags);
-	// else if (flags->flag_u && flags->flag_t)
-	// 	mx_sort_u(files_in_dir, count, dir_name, flags);
-	else if (flags->flag_t)
-		mx_sort_t(files_in_dir, count, dir_name, flags);
+	if (!flags->flag_f) {
+		mx_bubble_sort(files_in_dir, count);
 	
-	if (flags->flag_r)
-		mx_sort_r(files_in_dir, count);
-
+		if (flags->flag_S)
+			mx_sort_S(files_in_dir, count, dir_name, flags);
+		else if (flags->flag_t)
+			mx_sort_t(files_in_dir, count, dir_name, flags);
+		
+		if (flags->flag_r)
+			mx_sort_r(files_in_dir, count);
+	}
 	if (flags->flag_m) {
 		mx_flag_m(files_in_dir, count);
 		mx_printchar('\n');

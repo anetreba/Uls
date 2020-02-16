@@ -198,15 +198,15 @@ static void mx_itoa_to_string(unsigned int number, int n) {
 	free(str);
 }
 
-// char *time_T(time_t time /*, t_flag *fags*/) { //                     функцию ниже добавишь
-//     char *str;
-//     time_t sec = time(NULL);
-//     if (flag_T)
-//         str = mx_substr(ctime(&(time)), 4, 24);
-//     else
-//        str = mx_substr(ctime(&(time)), 4, 16);
-//     return str;
-// }
+char *time_T(time_t time, t_flag *flags) { //                     функцию ниже добавишь
+    char *str;
+    //time_t sec = time(NULL);
+    if (flags->flag_T)
+        str = mx_substr(ctime(&(time)), 4, 24);
+    else
+       str = mx_substr(ctime(&(time)), 4, 16);
+    return str;
+}
 
 void my_time(char *filename, t_flag *flags) {
     struct stat *file_info = malloc(sizeof(struct stat));
@@ -232,8 +232,8 @@ void my_time(char *filename, t_flag *flags) {
     	mx_print_spaces(1);
     	free(file_info);
     }
-    else {
-    	sub = mx_substr(ctime(&(time)), 4, 16);//                                 <- time_T(time);
+    else { 
+    	sub = time_T(time, flags);//mx_substr(ctime(&(time)), 4, 16);//                                 <- time_T(time);
     	mx_printstr(sub);
     	mx_print_spaces(1);
     	free(file_info);
@@ -255,19 +255,19 @@ void my_readlink(char *str, char *filename) {
     }
 }
 
-// void mx_flag_sobaka(char *str, char *filename/*, t_flag *flags */) { // <<<<<подключишь флажок
-//     char pog_champ[1024];
-//     size_t size_xat = 0;
-//     if (str[10] == '@'/* && flags->flag_sobaka */) {
-//         if (listxattr(filename, pog_champ, 1024, 1) >= 0)
-//         size_xat = getxattr(filename, pog_champ, 0, 1024, 0, 1);
-//         mx_printchar('\n');
-//         mx_print_spaces(8);
-//         mx_printstr(pog_champ);
-//         mx_print_spaces(6);
-//         mx_printint(size_xat);
-//     }
-// }
+void mx_flag_sobaka(char *str, char *filename, t_flag *flags) { // <<<<<подключишь флажок
+    char pog_champ[1024];
+    size_t size_xat = 0;
+    if (str[10] == '@' && flags->flag_sobaka ) {
+        if (listxattr(filename, pog_champ, 1024, 1) >= 0)
+        size_xat = getxattr(filename, pog_champ, 0, 1024, 0, 1);
+        mx_printchar('\n');
+        mx_print_spaces(8);
+        mx_printstr(pog_champ);
+        mx_print_spaces(6);
+        mx_printint(size_xat);
+    }
+}
 
 // void flag_h(long long n, t_flag *flags) {   //                       не успел доделать
 //     if (flags->flag_h) {
@@ -297,7 +297,7 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
         my_time(path[i], flags);
         mx_printstr(files_in_dir[i]);
         my_readlink(pr_dost, path[i]);
-        // mx_flag_sobaka(pr_dost, path[i]);
+        mx_flag_sobaka(pr_dost, path[i], flags);
         mx_printchar('\n');
     }
     // system("leaks uls");
