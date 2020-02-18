@@ -114,7 +114,7 @@ void len_difference(t_diff_len *l, t_len_column *lens, struct stat buff) {
 char **mx_find_path1(char **dirs_in, char *dir_name, int dir_count, t_flag *flags) {
     if (flags->flag_a)
         dir_count -= 2;
-    if (mx_strcmp(dir_name, ".") == 0)
+    if (dir_name == NULL)
         return dirs_in;
     char **path = (char **)malloc(sizeof(char *) * (dir_count + 1));
     char *tmp = NULL;
@@ -282,7 +282,6 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
     t_len_column *lens = (t_len_column *)malloc(sizeof(t_len_column));
     t_diff_len *l = (t_diff_len *)malloc(sizeof(t_diff_len));
     char **path = NULL;
-
     path = mx_find_path1(files_in_dir, dir_name, count, flags);
     total_blocks(files_in_dir, lens, dir_name, count, flags);
     for (int i = 0; path[i]; i++) {

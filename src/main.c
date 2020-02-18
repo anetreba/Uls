@@ -1,11 +1,22 @@
 #include "uls.h"
 
-int mx_count_files(char **file, int *dir_count) {
+int mx_link_check(char *file, t_flag *flags, struct stat *buf) {
+    int check = 0;
+
+    if (!flags->flag_l) 
+        check = stat(file, &(*buf));
+    else
+        check = lstat(file, &(*buf));
+    return check;
+}
+
+
+int mx_count_files(char **file, int *dir_count, t_flag *flags) {
 	int file_count = 0;
 	struct stat buf;
 
 	for (int i = 0; file[i]; i++) {
-		if (lstat(file[i], &buf) >= 0) {
+		if (mx_link_check(file[i], flags, &buf) >= 0) {
 			if ((buf.st_mode & S_IFDIR) != S_IFDIR)
                     file_count += 1;
             else if (((buf.st_mode & S_IFDIR) == S_IFDIR))
@@ -28,13 +39,13 @@ int mx_len_starr(char **file) {
 	return i;
 }
 
-char **mx_make_mas_of_files(char **file, int file_count) {
+char **mx_make_mas_of_files(char **file, int file_count, t_flag *flags) {
 	struct stat buf;
 	char **files = (char **)malloc(sizeof(char *) * (file_count + 1));
 	int i = 0;
 
 	for (int j = 0; file[j]; j++) {
-		if (lstat(file[j], &buf) >= 0) {
+		if (mx_link_check(file[i], flags, &buf) >= 0) {
 			if ((buf.st_mode & S_IFDIR) != S_IFDIR)
 				files[i++] = mx_strdup(file[j]); 
 		}
@@ -93,18 +104,20 @@ void mx_print_dirs(char **dirs, int dir_count, int file_count, t_flag *flags) {
 
 void mx_files_and_dir(char **file, t_flag *flags) {
 	int dir_count = 0;
-	int file_count = mx_count_files(file, &dir_count);
-	char **dirs = mx_make_mas_of_dirs(dir_count, file, mx_len_starr(file));
-	char **files = mx_make_mas_of_files(file, file_count);
+	int file_count = mx_count_files(file, &dir_count, flags);
+	char **dirs = mx_make_mas_of_dirs(dir_count, file, mx_len_starr(file), flags);
+	char **files = mx_make_mas_of_files(file, file_count, flags);
+	bool buf = false;
 
 	if (file_count > 0) {
+		buf = true;
 		mx_sort_flags(flags, files, file_count, NULL);
 		mx_print_flags(flags, files, file_count, NULL, dir_count);
 	}
 	mx_del_strarr(&files);
 	mx_sort_flags(flags, dirs, dir_count, NULL);
 	if (flags->flag_R)
-		mx_recursion_flag(dirs, dir_count, flags);
+		mx_recursion_flag(dirs, dir_count, flags, buf);
 	else 
 		mx_print_dirs(dirs, dir_count, file_count, flags);
 	mx_del_strarr(&dirs);

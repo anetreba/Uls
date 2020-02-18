@@ -1,12 +1,13 @@
 #include "uls.h"
 
 
-int mx_dir_count(char **files_in_dir) {
+int mx_dir_count(char **files_in_dir, t_flag *flags) {
 	struct stat buf;
 	int dir_count = 0;
 
 	for (int i = 0; files_in_dir[i]; i++) {
-			if (lstat(files_in_dir[i], &buf) >= 0) {
+			// if (lstat(files_in_dir[i], &buf) >= 0) {
+			if (mx_link_check(files_in_dir[i], flags, &buf) >= 0) {
     	 		if (((buf.st_mode & S_IFDIR) == S_IFDIR))
     	                dir_count += 1;
 			}
@@ -14,14 +15,15 @@ int mx_dir_count(char **files_in_dir) {
 	return dir_count;
 }
 
-char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count) {
+char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count, t_flag *flags) {
 	struct stat buf;
 	int k = 0;
 
 	if (*files_in_dir != NULL) {
 		char **dirs = (char **)malloc(sizeof(char *) * (dir_count + 1));
 		for (int j = 0; j < count; j++) {
-				if (lstat(files_in_dir[j], &buf) >= 0) {
+				// if (lstat(files_in_dir[j], &buf) >= 0) {
+			if (mx_link_check(files_in_dir[j], flags, &buf) >= 0) {
 					if (((buf.st_mode & S_IFDIR) == S_IFDIR)) 
 						dirs[k++] = mx_strdup(files_in_dir[j]);
 				}
@@ -79,14 +81,14 @@ void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir
 }
 
 
-char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
+char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k, bool buf) {
 	int count = mx_count_elem_in_dir(flags, dir_name);
 	char **path = NULL;
 	char **dirs_in = NULL;
 	if (count != 0) {
 		char **files_in_dir = mx_make_mas_of_elem_in_dir(flags, dir_name, count);
 		
-		if (*k) {
+		if (buf || *k) {
 			mx_printstr("\n");
 			mx_printstr(dir_name);
 			mx_printstr(":\n");
@@ -94,9 +96,9 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
 		*k = true;
 		mx_print_recursion(files_in_dir, count, flags, dir_name);
 		path = mx_make_path(files_in_dir, dir_name, count, flags);
-		*dir_count = mx_dir_count(path);
+		*dir_count = mx_dir_count(path, flags);
 		if (*dir_count != 0)
-			dirs_in = mx_make_mas_of_dirs(*dir_count, path, count);
+			dirs_in = mx_make_mas_of_dirs(*dir_count, path, count, flags);
 
 		mx_del_strarr(&files_in_dir);
 		mx_del_strarr(&path);
@@ -108,16 +110,16 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k) {
 
 
 
-void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags) {
+void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags, bool buf) {
 	char **dirs_in = NULL;
 	static bool k = false;
 	int dir_count_in = 0;
 	dir_count = 0;
 
 	for (int i = 0; dirs[i]; i++) {
-		dirs_in = mx_dir_in(flags, dirs[i], &dir_count_in, &k);
+		dirs_in = mx_dir_in(flags, dirs[i], &dir_count_in, &k, buf);
 		if (dirs_in != NULL) {
-			mx_recursion_flag(dirs_in, dir_count_in, flags);
+			mx_recursion_flag(dirs_in, dir_count_in, flags, buf);
 
 			mx_del_strarr(&dirs_in);
 		}

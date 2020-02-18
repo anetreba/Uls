@@ -66,12 +66,12 @@ typedef struct s_diff_len {
 	// int diff_time;
 }				t_diff_len;
 
-int mx_dir_count(char **files_in_dir);
-char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count);
+int mx_dir_count(char **files_in_dir, t_flag *flags);
+char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count, t_flag *flags);
 char **mx_make_path(char **dirs_in, char *dir_name, int dir_count, t_flag *flags);
 void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir_name);
-char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k);
-void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags);
+char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k, bool buf);
+void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags, bool buf);
 char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
 int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
 
@@ -91,9 +91,11 @@ void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags);
 void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags);
 
 void *mx_name_of_dir(char *s, int c);
-int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
-char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
+// int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
+// char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
 void mx_current_directory(t_flag *flags, char *dir_name);
+int mx_link_check(char *file, t_flag *flags, struct stat *buf);
+
 
 void mx_sort_S(char **files, int dir_count, char *file_name, t_flag *flags);
 void mx_sort_t(char **files, int dir_count, char *file_name, t_flag *flags);

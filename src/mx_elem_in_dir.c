@@ -95,12 +95,13 @@ void mx_current_directory(t_flag *flags, char *dir_name) {
 		int max_len = mx_count_max_len(files_in_dir);
 		mx_basic_print(files_in_dir, count, max_len);
 	}
+	bool buf = true;
 	if (flags->flag_R) {
-		mx_printchar('\n');
+		// mx_printchar('\n');
 		char **path = mx_make_path(files_in_dir, dir_name, count, flags);
-		int dir_count = mx_dir_count(path);
-		char **dirs_in = mx_make_mas_of_dirs(dir_count, path, count);
-		mx_recursion_flag(dirs_in, dir_count, flags);
+		int dir_count = mx_dir_count(path, flags);
+		char **dirs_in = mx_make_mas_of_dirs(dir_count, path, count, flags);
+		mx_recursion_flag(dirs_in, dir_count, flags, buf);
 	}
 	mx_del_strarr(&files_in_dir);
 
