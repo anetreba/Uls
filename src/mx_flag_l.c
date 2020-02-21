@@ -1,10 +1,29 @@
 #include "uls.h"
 
+char *mx_long_to_hex(unsigned long long nbr) {  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    unsigned long long n = nbr;
+    int len = 1;
+    char *res;
+
+    while (n / 16) {
+        len++;
+        n /= 16;
+    }
+    res = mx_strnew(len);
+    while (len--) {
+        res[len] = (nbr % 16 < 10) ? nbr % 16 + 48 : nbr % 16 + 87;
+        nbr /= 16;
+    }
+    return res;
+}
+
+
 void mx_bzero(void *s, size_t size) {
-  char *str = (char *)s;
-  for (size_t i = 0; i < size; ++i)
-    str[i] = '\0';
-  str = NULL;
+    char *str = (char *)s;
+  
+    for (size_t i = 0; i < size; ++i)
+        str[i] = '\0';
+    str = NULL;
 }
 
 void mx_print_spaces(int n) {
@@ -20,14 +39,26 @@ int mx_intlen(long long n) {
     return i;
 }
 
+char *hex_major_minor(long long n) {
+    char str[11] = "0x00000000\0";
+    char *tmp;
+    char *hex = mx_long_to_hex(n);
+    int len = (mx_strlen(str)) - mx_strlen(hex);
+    int i = 0;
 
+    while (str[len])
+        str[len++] = hex[i++];
+    tmp = mx_strdup(str);
+    free(hex);
+    return tmp;
+}
 
-char *mx_mychmod(int mode, char *str, char *dir_mame) {
+char *mx_mychmod(int mode, char *str, char *dir_mame, t_len_column *lens) {
     acl_t acl = NULL;
     ssize_t xattr = 0;
     char buf[1024];
 
-    mx_strcpy(str,"-----------");
+    mx_strcpy(str, "-----------");
     acl = acl_get_link_np(dir_mame, 256);
     xattr = listxattr(dir_mame, buf, 0, XATTR_NOFOLLOW);
     if (S_ISDIR(mode))str[0] = 'd';
@@ -47,6 +78,9 @@ char *mx_mychmod(int mode, char *str, char *dir_mame) {
         str[10] = '@';
     else
         str[10] = (acl != NULL) ? '+' : ' ';
+    if (str[0] == 'b' || str[0] == 'c')
+        lens->bc = true;
+    acl_free(acl);
     return str;
 }
 
@@ -79,10 +113,11 @@ void filling_struct(t_len_column *lens, struct stat buff) {
     if (groupinfo != NULL) {
         if (lens->len_gid < mx_strlen(groupinfo->gr_name))
             lens->len_gid = mx_strlen(groupinfo->gr_name);
-        else if (lens->len_gid < mx_intlen(userinfo->pw_gid))
-                lens->len_gid = mx_intlen(userinfo->pw_gid);
     }
-
+    else { 
+        if (lens->len_gid < mx_intlen(userinfo->pw_gid))
+            lens->len_gid = mx_intlen(userinfo->pw_gid);
+    }
     if (lens->len_size < mx_intlen(buff.st_size))
        lens->len_size = mx_intlen(buff.st_size);
 }
@@ -106,8 +141,10 @@ void len_difference(t_diff_len *l, t_len_column *lens, struct stat buff) {
     if (groupinfo != NULL) {
         if (lens->len_gid >= mx_strlen(groupinfo->gr_name))
             l->diff_gid -= mx_strlen(groupinfo->gr_name);
-        else if (lens->len_gid >= mx_intlen(userinfo->pw_gid))
-            l->diff_gid -= mx_intlen(userinfo->pw_gid);
+    }
+    else {
+        if (lens->len_gid >= mx_intlen(userinfo->pw_gid))
+           l->diff_gid -= mx_intlen(userinfo->pw_gid);
     }
 }
 
@@ -138,18 +175,18 @@ char **mx_find_path1(char **dirs_in, char *dir_name, int dir_count, t_flag *flag
     return path;
 }
 
-void total_blocks(char **files_in_dir, t_len_column *lens, char *dir_name, int count, t_flag *flags) {
+void total_blocks(char **path, t_len_column *lens) {
     struct stat buff;
     long long total = 0;
-    char **path = NULL;
 
     mx_memset(lens, 0, sizeof(t_len_column));
-    path = mx_find_path1(files_in_dir, dir_name, count, flags);
+    //path = mx_find_path1(files_in_dir, dir_name, count, flags);
     for (int i = 0; path[i]; i++) {
-        if (dir_name != NULL) 
-            lstat(path[i], &buff); 
-        else
-            lstat(files_in_dir[i], &buff);
+        //if (dir_name != NULL) {
+            lstat(path[i], &buff);
+        //} 
+        //else
+        //    lstat(files_in_dir[i], &buff);
         filling_struct(lens, buff);
        	total += buff.st_blocks;
 
@@ -162,16 +199,20 @@ void total_blocks(char **files_in_dir, t_len_column *lens, char *dir_name, int c
 void my_getgrgid(char *filename, int n) {
     struct group *groupinfo;
     struct stat buff;
+    char *str = NULL;
 
     lstat(filename, &buff);
     groupinfo = getgrgid(buff.st_gid);
     if (groupinfo != NULL) {
         mx_printstr(groupinfo->gr_name);
-        mx_print_spaces(n);
-        mx_print_spaces(1);
+        mx_print_spaces(n + 1);
     }
-    else
-        mx_itoa_to_string(buff.st_gid, n);
+    else {
+        str = mx_itoa(buff.st_gid);
+        mx_printstr(str);
+        mx_print_spaces(n + 1);
+        free(str);
+    }
 }
 
 void my_getuid(char *filename, int n) {
@@ -189,18 +230,18 @@ void my_getuid(char *filename, int n) {
     }
 }
 
-static void mx_itoa_to_string(unsigned int number, int n) {
+static void mx_itoa_to_string(unsigned int number, int otstup) {
 	char *str = mx_itoa(number);
 
-    mx_print_spaces(n);
+    mx_print_spaces(otstup);
 	mx_printstr(str);
 	mx_print_spaces(1);
 	free(str);
 }
 
-char *time_T(time_t time, t_flag *flags) { //                     функцию ниже добавишь
+char *time_T(time_t time, t_flag *flags) {
     char *str;
-    //time_t sec = time(NULL);
+
     if (flags->flag_T)
         str = mx_substr(ctime(&(time)), 4, 24);
     else
@@ -222,7 +263,7 @@ void my_time(char *filename, t_flag *flags) {
     else 
         time = file_info->st_mtime;
 
-    if ((sec - (time)) > 15552000 || sec < 0) {
+    if (((sec - (time)) > 15552000 || sec < 0 ) && !(flags->flag_T)) {
         sub = mx_substr(ctime(&(file_info->st_mtime)), 4, 10);
     	mx_printstr(sub);
     	free(sub);
@@ -233,7 +274,7 @@ void my_time(char *filename, t_flag *flags) {
     	free(file_info);
     }
     else { 
-    	sub = time_T(time, flags);//mx_substr(ctime(&(time)), 4, 16);//                                 <- time_T(time);
+    	sub = time_T(time, flags);
     	mx_printstr(sub);
     	mx_print_spaces(1);
     	free(file_info);
@@ -253,12 +294,13 @@ void my_readlink(char *str, char *filename) {
         mx_bzero(ayaya, sizeof(ayaya));
         ayaya[0] = '\0';
     }
+    //free << may be
 }
 
-void mx_flag_sobaka(char *str, char *filename, t_flag *flags) { // <<<<<подключишь флажок
+void mx_flag_sobaka(char *str, char *filename, t_flag *flags) {
     char pog_champ[1024];
     size_t size_xat = 0;
-    if (str[10] == '@' && flags->flag_sobaka ) {
+    if (str[10] == '@' && flags->flag_sobaka) {
         if (listxattr(filename, pog_champ, 1024, 1) >= 0)
         size_xat = getxattr(filename, pog_champ, 0, 1024, 0, 1);
         mx_printchar('\n');
@@ -269,12 +311,78 @@ void mx_flag_sobaka(char *str, char *filename, t_flag *flags) { // <<<<<подк
     }
 }
 
-// void flag_h(long long n, t_flag *flags) {   //                       не успел доделать
-//     if (flags->flag_h) {
-//         n /= 1024;
-//         str = mx_itoa(n);
-//     }
-// }
+char *flag_h_check(double size, t_flag *flags) {
+    char *str = NULL;
+    char *tmp = NULL;
+    const char *format[] = {"B", "K", "M", "G", "T"};
+    int i = 0;
+    
+    if (flags->flag_h) {
+        while (size > 1024) {
+            size /= 1024.0;
+            i++;
+        }
+        str = mx_itoa(size);
+        tmp = mx_strjoin(str, format[i]);
+        free(str);
+    }
+    else
+        tmp = mx_itoa(size);
+    return tmp;   
+}
+
+void print_size(char *s, int n, t_flag *flags) {    
+    if (flags->flag_h) {
+        int len = mx_strlen(s);
+        int diff = 6 - len;
+
+        mx_print_spaces(diff);
+        mx_printstr(s);
+        mx_print_spaces(1);
+    }
+    else {
+        mx_print_spaces(n + 1);
+        mx_printstr(s);
+        mx_print_spaces(1);
+    }
+    free(s);
+}
+
+void print_major(t_len_column *lens, struct stat buff, int col, char *pr_dost, t_flag *flags) {
+    if (pr_dost[0] == 'c' || pr_dost[0] == 'b') {
+        lens->min = minor(buff.st_rdev);
+        lens->maj = major(buff.st_rdev);
+        int len_min = mx_intlen(lens->min);
+        int len_maj = mx_intlen(lens->maj);
+        int diff_maj = 4 - len_maj;
+        int diff_min = 4 - len_min;
+
+        mx_print_spaces(diff_maj);
+        mx_printint(lens->maj);
+        mx_printchar(',');
+        if (lens->min < 256) {
+            mx_print_spaces(diff_min);
+            mx_printint(lens->min);
+            mx_print_spaces(1);
+        }
+        else {
+            char *str = hex_major_minor(lens->min);
+
+            mx_print_spaces(1);
+            mx_printstr(str);
+            mx_print_spaces(1);
+            free(str);
+        }
+    }
+    else if (lens->bc) {
+        mx_print_spaces(7);
+        print_size(flag_h_check(buff.st_size, flags), col, flags);
+    }
+    else
+        print_size(flag_h_check(buff.st_size, flags), col, flags);
+}
+
+
 
 void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
     char pr_dost[12];
@@ -282,22 +390,26 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
     t_len_column *lens = (t_len_column *)malloc(sizeof(t_len_column));
     t_diff_len *l = (t_diff_len *)malloc(sizeof(t_diff_len));
     char **path = NULL;
+
     path = mx_find_path1(files_in_dir, dir_name, count, flags);
-    total_blocks(files_in_dir, lens, dir_name, count, flags);
+    total_blocks(path, lens);
     for (int i = 0; path[i]; i++) {
         lstat(path[i], &buff);
         len_difference(l, lens, buff);
-        mx_printstr(mx_mychmod(buff.st_mode, pr_dost, path[i]));
+        mx_printstr(mx_mychmod(buff.st_mode, pr_dost, path[i], lens));
         mx_print_spaces(1);
         mx_itoa_to_string(buff.st_nlink, l->diff_link);
         my_getuid(path[i], l->diff_user);
         my_getgrgid(path[i], l->diff_gid);
-        mx_itoa_to_string(buff.st_size, l->diff_size + 1);
+        print_major(lens, buff, l->diff_size, pr_dost, flags);
+        // print_size(flag_h_check(buff.st_size, flags),l->diff_size, flags);
         my_time(path[i], flags);
         mx_printstr(files_in_dir[i]);
         my_readlink(pr_dost, path[i]);
         mx_flag_sobaka(pr_dost, path[i], flags);
         mx_printchar('\n');
+        // free(files_in_dir[i]);
+        // printf(" %d", lens->len_user);
     }
     // system("leaks uls");
 }

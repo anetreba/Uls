@@ -61,7 +61,6 @@ void mx_sort_flags(t_flag *flags, char **files, int file_count, char *dir_name) 
 			mx_sort_S(files, file_count, dir_name, flags);		
 		else if (flags->flag_t)
 			mx_sort_t(files, file_count, dir_name, flags);
-	
 		if (flags->flag_r)
 			mx_sort_r(files, file_count);
 	}
@@ -77,13 +76,13 @@ void mx_print_flags(t_flag *flags, char **files, int file_count, char *dir_name,
 	}
 	else if (flags->flag_1)
 		mx_flag_1(files, file_count);
-	else if (flags->flag_G || flags->flag_F || flags->flag_p)
+	else if (flags->flag_G)
 		mx_flag_G(files, file_count, dir_name, flags);
 	else if (flags->flag_l)
 		mx_flag_l(files, file_count, dir_name, flags);
 	else {
 		int max_len = mx_count_max_len(files);
-		mx_basic_print(files, file_count, max_len);
+		mx_basic_print(files, file_count, max_len, flags, dir_name);
 	}
 }
 

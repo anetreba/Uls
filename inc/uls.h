@@ -37,6 +37,8 @@ typedef struct s_flag {
 	bool flag_T;
 	bool flag_sobaka; // dopilit'
 	bool flag_f;
+	bool flag_C;
+	bool flag_h;
 }				t_flag;
 
 typedef struct s_sort {
@@ -49,22 +51,23 @@ typedef struct s_sort {
 }               t_sort;
 
 typedef struct s_len_column {
-	int len_prav;
-	int	len_link;
-	int len_user;
-	int len_gid;
-	int len_size;
-	int len_time;
-}				t_len_column;
+  int len_prav;
+  int  len_link;
+  int len_user;
+  int len_gid;
+  int len_size;
+  int len_time;
+  size_t min;
+  size_t maj;
+  bool bc;
+}        t_len_column;
 
 typedef struct s_diff_len {
-	// int diff_prav;
-	int	diff_link;
-	int diff_user;
-	int diff_gid;
-	int diff_size;
-	// int diff_time;
-}				t_diff_len;
+  int  diff_link;
+  int diff_user;
+  int diff_gid;
+  int diff_size;
+}        t_diff_len;
 
 int mx_dir_count(char **files_in_dir, t_flag *flags);
 char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count, t_flag *flags);
@@ -77,22 +80,23 @@ int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
 
 
 int mx_count_max_len(char **files_in_dir);
-int mx_num_of_cols(char **files_in_dir, int count);
-void mx_choose_print_action(char *files_in_dir);
 void basic_tab_print(int arg_len, int max_len);
-void mx_basic_print(char **files_in_dir, int count, int max_len);
+void mx_basic_print(char **files_in_dir, int count, int max_len, t_flag *flags, char *dir_name);
 
 
 char **mx_valid_flag(int ac, char **av, t_flag *flags);
+
+void mx_sort_flags(t_flag *flags, char **files, int file_count, char *dir_name);
 
 void mx_flag_m(char **files_in_dir, int count);
 void mx_flag_1(char **files_in_dir, int count);
 void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags);
 void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags);
+void mx_flag_p(char *obj, t_flag *flags, char *file_name);
 
 void *mx_name_of_dir(char *s, int c);
-// int mx_count_elem_in_dir(t_flag *flags, char *dir_name);
-// char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
+void mx_print_cat(char **files_in_dir, int count);
+
 void mx_current_directory(t_flag *flags, char *dir_name);
 int mx_link_check(char *file, t_flag *flags, struct stat *buf);
 

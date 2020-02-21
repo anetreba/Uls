@@ -13,24 +13,39 @@ int mx_count_max_len(char **files_in_dir) {
 	return max;
 }
 
-int mx_num_of_cols(char **files_in_dir, int count) {
+void mx_print_cat(char **files_in_dir, int count) {
+	for (int i = 0; i < count; i++) {
+		mx_printstr(files_in_dir[i]);
+		mx_printchar('\n');
+	}
+}
+
+int mx_num_of_cols(char **files_in_dir, int count, t_flag *flags) {
 	struct winsize w;
 	int max_len = mx_count_max_len(files_in_dir);
 	int cols = 0;
 	int lines = 0;
 
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	if (isatty(1) == 0 && flags->flag_C) 
+            w.ws_col = 79;
 	cols = (w.ws_col / ((8 - (max_len % 8)) + max_len));
 	lines = count / cols; //количество елементов вывода
-	if (lines == 0 || ((count % cols) != 0))
-		lines++;
+	if (isatty(1) !=  0 || flags->flag_C) {
+		if (lines == 0 || ((count % cols) != 0))
+			lines++;
+	}
+	else {
+		mx_print_cat(files_in_dir, count);
+		return -1;
+	}
 	return lines;
 }
 
-void mx_choose_print_action(char *files_in_dir) {
-	// *files_in_dir = *files_in_dir;
-	// printf("la\n");
+void mx_choose_print_action(char *files_in_dir, t_flag *flags, char *dir_name) {
 	mx_printstr(files_in_dir);
+	if (flags->flag_F || flags->flag_p)
+		mx_flag_p(files_in_dir, flags, dir_name);
 
 }
 
@@ -48,22 +63,24 @@ void basic_tab_print(int arg_len, int max_len) {
 	}
 }
 
-void mx_basic_print(char **files_in_dir, int count, int max_len) {
+void mx_basic_print(char **files_in_dir, int count, int max_len, t_flag *flags, char *dir_name) {
 	int j;
 	int sub_r;
-	int num_of_lines = mx_num_of_cols(files_in_dir, count);
+	int num_of_lines = mx_num_of_cols(files_in_dir, count, flags);
 
-	for (int i = 0; i < num_of_lines; i++) {
-		j = 0;
-		sub_r = 0;
-		for (int j = 0; files_in_dir[j]; j++) {
-			if ((j + num_of_lines - i) % num_of_lines == 0) {
-				mx_choose_print_action(files_in_dir[j]);
-				if (sub_r + num_of_lines < count)
-					basic_tab_print(mx_strlen(files_in_dir[j]), max_len);
+	if (num_of_lines != -1) {
+		for (int i = 0; i < num_of_lines; i++) {
+			j = 0;
+			sub_r = 0;
+			for (int j = 0; files_in_dir[j]; j++) {
+				if ((j + num_of_lines - i) % num_of_lines == 0) {
+					mx_choose_print_action(files_in_dir[j], flags, dir_name);
+					if (sub_r + num_of_lines < count)
+						basic_tab_print(mx_strlen(files_in_dir[j]), max_len);
+				}
+				++sub_r;
 			}
-			++sub_r;
+			mx_printchar('\n');
 		}
-		mx_printchar('\n');
 	}
 }

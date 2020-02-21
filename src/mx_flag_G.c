@@ -211,6 +211,7 @@ void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags) {
     int rows = get_rows(count, m_l);
     int spacing = 0;
 
+    if (isatty(1) != 0) {
     for (int j = 0; j < rows; j++) {
         for (int i = j; i < count; i += rows) {
             if (!files_in_dir[i])
@@ -225,4 +226,8 @@ void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags) {
         }
         write(1, "\n", 1);
 	}
+}
+    else
+        mx_print_cat(files_in_dir, count);
+
 }

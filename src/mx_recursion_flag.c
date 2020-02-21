@@ -76,7 +76,7 @@ void mx_print_recursion(char **files_in_dir, int count, t_flag *flags, char *dir
 		mx_flag_G(files_in_dir, count, dir_name, flags);
 	else {
 		int max_len = mx_count_max_len(files_in_dir);		
-		mx_basic_print(files_in_dir, count, max_len);
+		mx_basic_print(files_in_dir, count, max_len, flags, dir_name);
 	}
 }
 
