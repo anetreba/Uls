@@ -1,52 +1,66 @@
 #include "uls.h"
 
+void mx_struct_flag3(char *av, t_flag *flags, char *flag, bool *fl) {
+	for (int j = 1; av[j]; j++) {
+		if (av[j] == flag[5]) {
+			flags->flag_S = true;
+			*fl = true;
+		}
+		if (av[j] == flag[7]) {
+			flags->flag_t = true;
+			*fl = true;
+		}
+		if (av[j] == flag[8]) {
+			mx_valid_sort(flags);
+			flags->flag_u = true;
+			*fl = true;
+		}
+		if (av[j] == flag[9]) {
+			mx_valid_sort(flags);
+			flags->flag_c = true;
+			*fl = true;
+		}
+	}
+}
+
+void mx_struct_flag5(char *av, t_flag *flags, char *flag, bool *fl) {
+	for (int j = 1; av[j]; j++) {
+		if (av[j] == flag[13]) {
+			flags->flag_F = true;
+			*fl = true;
+		}
+		else if (av[j] == flag[14]) {
+			flags->flag_T = true;
+			*fl = true;
+		}
+		else if (av[j] == flag[15]){
+			flags->flag_sobaka = true;
+			*fl = true;
+		}
+		else if (av[j] == flag[16]) {
+			flags->flag_f = true;
+			*fl = true;
+		}
+	}
+}
+
 void mx_struct_flag(char *av, t_flag *flags, char *flag) {
-	for (int j = 1; av[j] ; j++) {
-		if (av[j] == flag[0])
-			flags->flag_A = true;
-		else if (av[j] == flag[1])
-			flags->flag_a = true;
-		else if (av[j] == flag[3])
-			flags->flag_l = true;
+	bool fl = false;
+
+	for (int j = 1; av[j]; j++) {
+		mx_struct_flag1(av, flags, flag, &fl);
+		mx_struct_flag2(av, flags, flag, &fl);
+		mx_struct_flag3(av, flags, flag, &fl);
+		mx_struct_flag4(av, flags, flag, &fl);
+		mx_struct_flag5(av, flags, flag, &fl);
+		if (av[j] == flag[18])
+			flags->flag_h = true;
+		else if (av[j] == flag[19])
+			flags->flag_U = true;
 		else if (av[j] == flag[2])
 			flags->flag_R = true;
-		else if (av[j] == flag[4])
-			flags->flag_m = true;
-		else if (av[j] == flag[6])
-			flags->flag_1 = true;
-		else if (av[j] == flag[5])
-			flags->flag_S = true;
-		else if (av[j] == flag[7])
-			flags->flag_t = true;
-		else if (av[j] == flag[8])
-			flags->flag_u = true;
-		else if (av[j] == flag[9])
-			flags->flag_c = true;
-		else if (av[j] == flag[10])
-			flags->flag_r = true;
-		else if (av[j] == flag[11])
-			flags->flag_G = true;
-		else if (av[j] == flag[12])
-			flags->flag_p = true;
-		else if (av[j] == flag[13])
-			flags->flag_F = true;
-		else if (av[j] == flag[14])
-			flags->flag_T = true;
-		else if (av[j] == flag[15])
-			flags->flag_sobaka = true;
-		else if (av[j] == flag[16])
-			flags->flag_f = true;
-		else if (av[j] == flag[17])
-			flags->flag_C = true;
-		else if (av[j] == flag[18])
-			flags->flag_h = true;
-		else {
-			mx_printerr("uls: illegal option -- ");
-			char c = av[j];
-			mx_printerr(&c);
-			mx_printerr("\nusage: uls [-ARFGSTacflmprtu1] [file ...]\n");
-			exit(1);
-		}
+		else if (!fl || mx_error_case(av[j], flag))
+			mx_print_error_flag(av[j]);
 	}
 }
 
@@ -59,8 +73,7 @@ char **mx_create_file(char **av, int ac, int count_files, char **file) {
 		if (flag_priority == true) {			
 			if (av[i][0] != '-') {
 				flag_priority = false;
-				file[g] = mx_strdup(av[i]);
-				g++;
+				file[g++] = mx_strdup(av[i]);
 			}
 			if (av[i][0] == '-' && av[i][1] == '-')
 				flag_priority = false;
@@ -75,12 +88,12 @@ char **mx_create_file(char **av, int ac, int count_files, char **file) {
 }
 
 char **mx_valid_flag(int ac, char **av, t_flag *flags) {
-	char flag[] = "AaRlmS1tucrGpFT@fCh";
+	char flag[] = "AaRlmS1tucrGpFT@fChU";
 	bool flag_priority = true;
 	int count_files = 0;
 	char **file = NULL;
 
-	for(int i = 1; i < ac; i++) {
+	for(int i = 1; i < ac; i++)
 		if (flag_priority == true) {
 			if (av[i][0] == '-' && av[i][1] != '-')
 				mx_struct_flag(av[i], flags, flag);
@@ -93,8 +106,6 @@ char **mx_valid_flag(int ac, char **av, t_flag *flags) {
 		}
 		else if (!flag_priority)
 			count_files++;
-	}
-
 	file = mx_create_file(av, ac, count_files, file);
 	return file;
 }

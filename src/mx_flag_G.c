@@ -13,92 +13,7 @@ char *mx_find_path(char *file, char *file_name) {
     return filepath2;
 }
 
-static char dir_check(struct stat buf) {
-    char c = '-';
-
-    if ((buf.st_mode & S_IFMT) == S_IFDIR)
-    {
-        c = 'd';
-        if ((buf.st_mode & S_ISVTX) == S_ISVTX
-            && (buf.st_mode & S_IWOTH) == S_IWOTH)
-        {
-            c = 'x';
-        }
-        else if ((buf.st_mode & S_IWOTH) == S_IWOTH)
-            c = 'n';
-    }
-    return c;
-}
-
-static char second_mode_unit(struct stat buf) {
-    char c = '-';
-
-    switch (buf.st_mode & S_IFMT)
-    {
-        case (S_IFBLK):
-            c = 'b';
-            break;
-        case (S_IFCHR):
-            c = 'c';
-            break;
-        case (S_IFIFO):
-            c = 'p';
-            break;
-    }
-    if (c == '-')
-        c = dir_check(buf);
-    return c;
-}
-
-static char file_check(struct stat buf) {
-    char c = '-';
-
-    if ((buf.st_mode & S_IFMT) == S_IFREG)
-    {
-        c = 'f';
-        if ((buf.st_mode & S_IXUSR) == S_IXUSR) {
-            c = 'e';
-            if ((buf.st_mode & S_ISUID) == S_ISUID)
-                c = 'u';
-            else if ((buf.st_mode & S_ISGID) == S_ISGID)
-                c = 'g';
-        }
-    }
-    return c;
-}
-
-static char one_mode_unit(struct stat buf) {
-    char c = '-';
-
-    switch (buf.st_mode & S_IFMT)
-    {
-        case (S_IFSOCK):
-            c = 's';
-            break;
-        case (S_IFLNK):
-            c = 'l';
-            break;
-    }
-    if (c == '-')
-        c = file_check(buf);
-    return c;
-}
-
-char mx_file_mode_check(char *file, char *file_name) {
-    char c;
-    char *filepath = mx_find_path(file, file_name);
-    struct stat buf;
-
-    lstat(filepath, &buf);
-    c = one_mode_unit(buf);
-    if (c == '-')
-        c = second_mode_unit(buf);
-    if (file_name != NULL)
-        mx_strdel(&filepath);
-    return c;
-}
-
-static void color_mode_two(char c) {
+void mx_color_mode_two(char c) {
 	if (c == 'x')
 		write(1, "\33[0;30;42m", mx_strlen("\33[0;30;42m"));
 	else if (c == 'u')
@@ -113,7 +28,7 @@ static void color_mode_two(char c) {
 		write(1, "\33[0;34m", mx_strlen("\33[0;34m"));
 }
 
-static void color_mode_one(char c) {
+void mx_color_mode_one(char c) {
 	if (c == 'd')
 		write(1, "\33[0;34m", mx_strlen("\33[0;34m"));
 	else if (c == 'l')
@@ -126,36 +41,7 @@ static void color_mode_one(char c) {
 		write(1, "\33[0;34;46m", mx_strlen("\33[0;34;46m"));
 }
 
-void mx_colour_out(char *file, char *file_name) {
-    char c = mx_file_mode_check(file, file_name);
-//for (int i = 0; files_in_dir[i]; i++)
-    int size = mx_strlen(file);
-
-    write(1, "\33[0m", mx_strlen("\33[0m"));
-    color_mode_one(c);
-    color_mode_two(c);
-    write (1, file, size);
-    write(1, "\33[0m", mx_strlen("\33[0m"));
-
-}
-
-int mx_get_ws() {
-	struct winsize ws;
-	int fd;
-	int cols = 0;
-
-	fd = open("/dev/tty", O_RDWR);
-	if (fd < 0)
-		err(1, "/dev/tty");
-	if (ioctl(fd, TIOCGWINSZ, &ws) < 0)
-		err(1, "/dev/tty");
-	close(fd);
-	cols = ws.ws_col;
-	return cols;
-}
-
-
-static int get_rows(int count, int max_len) {
+int get_rows(int count, int max_len) {
     int rows;
     int one_line = 0;
     int w_s = mx_get_ws();
@@ -169,65 +55,25 @@ static int get_rows(int count, int max_len) {
     return rows;
 }
 
-static void spacing_print(int sp) {
-    char c = ' ';
-
-    while (sp > 0) {
-        write(1, &c, 1);
-        sp--;
-    }
-}
-
-static void flag_F(char *obj, char *file_name) {
-    char c;
-
-    c = mx_file_mode_check(obj, file_name);
-        if (c == 'l')
-            write(1, "@", 1);
-        else if (c == 'e')
-            write(1, "*", 1);
-        else if (c == 'd')
-            write(1, "/", 1);
-        else if (c == 's')
-            write(1, "=", 1);
-        else if (c == 'p')
-            write(1, "|", 1);
-}
-
-void mx_flag_p(char *obj, t_flag *flags, char *file_name) {
-    char c;
-
-    if (flags->flag_F)
-        flag_F(obj, file_name);
-    else {
-        c = mx_file_mode_check(obj, file_name);
-        if (c == 'd')
-            write(1, "/", 1);
-    }
-}
-
-void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags) {
-    int m_l = mx_count_max_len(files_in_dir);
+void mx_flag_G(char **files_in_dir, int count, char *file_name,
+    t_flag *flags) {
+    int m_l = mx_count_max_len(files_in_dir, flags, file_name);
     int rows = get_rows(count, m_l);
     int spacing = 0;
 
     if (isatty(1) != 0) {
-    for (int j = 0; j < rows; j++) {
-        for (int i = j; i < count; i += rows) {
-            if (!files_in_dir[i])
-                break;
-            spacing = m_l - mx_strlen(files_in_dir[i]) + 1;
-            if ((i + rows) >= count)
-                spacing = 0;
-            mx_colour_out(files_in_dir[i], file_name);
-            if (flags->flag_p || flags->flag_F)
-                mx_flag_p(files_in_dir[i], flags, file_name);
-            spacing_print(spacing);
-        }
-        write(1, "\n", 1);
-	}
-}
+        for (int j = 0; j < rows; j++) {
+            for (int i = j; i < count; i += rows) {
+                if (!files_in_dir[i])
+                    break;
+                spacing = m_l - mx_strlen(files_in_dir[i]) + 1;
+                if ((i + rows) >= count)
+                    spacing = 0;
+                mx_print_G(files_in_dir[i], flags, file_name, spacing);
+            }
+            write(1, "\n", 1);
+    	}
+    }
     else
-        mx_print_cat(files_in_dir, count);
-
+        mx_print_cat(files_in_dir, count, flags, file_name);
 }
