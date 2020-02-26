@@ -18,7 +18,7 @@ void mx_flag_F(char *obj, char *file_name) {
 
 int mx_num_of_cols(char **files_in_dir, int count, t_flag *flags, char *dir_name) {
 	struct winsize w;
-	int max_len = mx_count_max_len(files_in_dir, flags, dir_name);
+	int max_len = mx_count_max_len(files_in_dir);
 	int cols = 0;
 	int lines = 0;
 
@@ -66,7 +66,6 @@ void mx_basic_print(char **files_in_dir, int count, int max_len, t_flag *flags,
 	int j;
 	int sub_r;
 	int num_of_lines = mx_num_of_cols(files_in_dir, count, flags, dir_name);
-	int num = 0;
 
 	if (num_of_lines != -1) {
 		for (int i = 0; i < num_of_lines; i++) {
@@ -75,17 +74,8 @@ void mx_basic_print(char **files_in_dir, int count, int max_len, t_flag *flags,
 			for (int j = 0; files_in_dir[j]; j++) {
 				if ((j + num_of_lines - i) % num_of_lines == 0) {
 					mx_choose_print_action(files_in_dir[j], flags, dir_name);
-					if (sub_r + num_of_lines < count) {
-						if (flags->flag_p || flags->flag_F) {
-							char c = mx_file_mode_check(files_in_dir[j], dir_name);
-        					if ((c == 'd') || (c == 'l') || (c == 'e') 
-        						|| (c == 's') || (c == 'p'))
-        						num = mx_strlen(files_in_dir[j]) + 1;
-        				}
-        				else 
-        					num = mx_strlen(files_in_dir[j]);
-						basic_tab_print(num, max_len);
-					}
+					if (sub_r + num_of_lines < count)
+						basic_tab_print(mx_strlen(files_in_dir[j]), max_len);
 				}
 				++sub_r;
 			}

@@ -11,8 +11,8 @@ char *mx_mychmod(int mode, char *str, char *dir_mame, t_len_column *lens) {
 
     mx_strcpy(str, "-----------");
     acl = acl_get_file(dir_mame, ACL_TYPE_EXTENDED);
-    text_acl = acl_to_text(acl, &xattr);
     xattr = listxattr(dir_mame, buf, 0, XATTR_NOFOLLOW);
+    text_acl = acl_to_text(acl, &xattr);
     permissions(mode, str);
     permissions2(mode, str);
     if (xattr > 0)
@@ -42,6 +42,8 @@ static void permissions(int mode, char *str) {
         str[3] = 'x';
     if ((mode & S_ISUID) == S_ISUID)
         str[3] = 's';
+    if (mode & S_ISUID)
+        str[3] = (str[3] == 'x') ? 's' : 'S';
 }
 
 static void permissions2(int mode, char *str) {
@@ -51,14 +53,16 @@ static void permissions2(int mode, char *str) {
         str[5] = 'w';
     if (mode & S_IXGRP)
         str[6] = 'x';
+    if ((mode & S_ISGID) == S_ISGID)
+        str[6] = 's';
+    if (mode & S_ISGID)
+        str[6] = (str[6] == 'x') ? 's' : 'S';
     if (mode & S_IROTH)
         str[7] = 'r';
     if (mode & S_IWOTH)
         str[8] = 'w';
     if (mode & S_IXOTH)
         str[9] = 'x';
-    if ((mode & S_ISVTX) == S_ISVTX)
-        str[9] = 't';
-    if ((mode & S_ISGID) == S_ISGID)
-        str[6] = 's';
+    if (mode & S_ISVTX)
+        str[9] = (str[9] == 'x') ? 't' : 'T';
 }

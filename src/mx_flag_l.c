@@ -28,9 +28,16 @@ static void total_blocks(char **path, t_len_column *lens, char *dir_name) {
 }
 
 static void help_flag_l(char *path, t_flag *flags, char *files_in_dir, 
-    char *pr_dost) {
+    char *pr_dost, char *dir_name) {
         mx_my_time(path, flags);
-        mx_printstr(files_in_dir);
+        if (flags->flag_G)
+            mx_colour_out(files_in_dir, dir_name);
+        else if (flags->flag_p || flags->flag_F) {
+            mx_printstr(files_in_dir);
+            mx_flag_p(files_in_dir, flags, dir_name);
+        }
+        else
+            mx_printstr(files_in_dir);
         my_readlink(pr_dost, path);
         mx_flag_sobaka(pr_dost, path, flags);
         mx_printchar('\n');
@@ -46,8 +53,8 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
     struct stat buff;
     t_len_column *lens = (t_len_column *)malloc(sizeof(t_len_column));
     t_diff_len *l = (t_diff_len *)malloc(sizeof(t_diff_len));
-    char **path = mx_find_path_l(files_in_dir, dir_name, count, flags);;
 
+    char **path = mx_find_path_l(files_in_dir, dir_name, count);;
     total_blocks(path, lens, dir_name);
     for (int i = 0; path[i]; i++) {
         lstat(path[i], &buff);
@@ -57,7 +64,7 @@ void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags) {
         mx_my_getuid(path[i], l->diff_user);
         mx_my_getgrgid(path[i], l->diff_gid);
         print_major(lens, buff, l->diff_size, pr_dost, flags);
-        help_flag_l(path[i], flags, files_in_dir[i], pr_dost);
+        help_flag_l(path[i], flags, files_in_dir[i], pr_dost, dir_name);
     }
     free(lens);
     free(l);

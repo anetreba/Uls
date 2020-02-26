@@ -1,6 +1,6 @@
 #include "uls.h"
 
-int mx_count_max_len(char **files_in_dir, t_flag *flags, char *dir_name) {
+int mx_count_max_len(char **files_in_dir) {
 	int max = 0;
 
 	if (*files_in_dir != NULL || files_in_dir != NULL) {		
@@ -8,15 +8,6 @@ int mx_count_max_len(char **files_in_dir, t_flag *flags, char *dir_name) {
 		for (int i = 1; files_in_dir[i]; i++) {
 			if (max < mx_strlen(files_in_dir[i])) {
 				max = mx_strlen(files_in_dir[i]);
-				char c = mx_file_mode_check(files_in_dir[i], dir_name);
-				if (flags->flag_F) {
-        			if ((c == 'd') || (c == 'l') || (c == 'e') || (c == 's') || (c == 'p'))
-        				max++;
-				}
-        		else if (flags->flag_p)
-        			if (c == 'd')
-        				max++;
-
 			}
 		}
 	}
@@ -33,12 +24,12 @@ void mx_print_flags(t_flag *flags, char **files, int file_count, char *dir_name
 	}
 	else if (flags->flag_1)
 		mx_flag_1(files, file_count);
+	else if (flags->flag_l) 
+		mx_flag_l(files, file_count, dir_name, flags);
 	else if (flags->flag_G)
 		mx_flag_G(files, file_count, dir_name, flags);
-	else if (flags->flag_l)
-		mx_flag_l(files, file_count, dir_name, flags);
 	else {
-		int max_len = mx_count_max_len(files, flags, dir_name);
+		int max_len = mx_count_max_len(files);
 		mx_basic_print(files, file_count, max_len, flags, dir_name);
 	}
 }

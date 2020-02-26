@@ -116,13 +116,10 @@ char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count,
 	t_flag *flags);
 char **mx_make_path(char **dirs_in, char *dir_name, int dir_count,
 	t_flag *flags);
-void mx_print_recursion(char **files_in_dir, int count, t_flag *flags,
-	char *dir_name);
 void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags,
 	bool buf, int *err);
 char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count);
 int mx_count_elem_in_dir(t_flag *flags, char *dir_name, int *err);
-int mx_link_check(char *file, t_flag *flags, struct stat *buf);
 int mx_count_files(char **file, int *dir_count, t_flag *flags, int *err);
 int mx_len_starr(char **file);
 char **mx_make_mas_of_files(char **file, int file_count, t_flag *flags);
@@ -147,8 +144,7 @@ void mx_struct_flag1(char *av, t_flag *flags, char *flag, bool *fl);
 void mx_valid_sort(t_flag *flags);
 void mx_struct_flag2(char *av, t_flag *flags, char *flag, bool *fl);
 
-int mx_count_max_len(char **files_in_dir, t_flag *flags, char *dir_name);
-void basic_tab_print(int arg_len, int max_len);
+int mx_count_max_len(char **files_in_dir);
 void mx_basic_print(char **files_in_dir, int count, int max_len, t_flag *flags,
 	char *dir_name);
 void mx_print_flags(t_flag *flags, char **files, int file_count,
@@ -162,7 +158,8 @@ void mx_flag_G(char **files_in_dir, int count, char *file_name, t_flag *flags);
 void mx_flag_l(char **files_in_dir, int count, char *dir_name, t_flag *flags);
 void mx_flag_p(char *obj, t_flag *flags, char *file_name);
 void *mx_name_of_dir(char *s, int c);
-void mx_print_cat(char **files_in_dir, int count, t_flag *flags, char *dir_name);
+void mx_print_cat(char **files_in_dir, int count, t_flag *flags,
+	char *dir_name);
 void mx_current_directory(t_flag *flags, char *dir_name, int *err);
 int mx_link_check(char *file, t_flag *flags, struct stat *buf);
 void mx_sort_S(char **files, int dir_count, char *file_name, t_flag *flags);
@@ -176,8 +173,7 @@ int mx_intlen(long long n);
 char *mx_mychmod(int mode, char *str, char *dir_mame, t_len_column *lens);
 void filling_struct(t_len_column *lens, struct stat buff);
 void len_difference(t_diff_len *l, t_len_column *lens, struct stat buff);
-char **mx_find_path_l(char **dirs_in, char *dir_name, int dir_count,
-	t_flag *flags);
+char **mx_find_path_l(char **dirs_in, char *dir_name, int dir_count);
 char* mx_substr(const char *src, int a, int b);
 void mx_my_time(char *filename, t_flag *flags);
 void mx_my_getuid(char *filename, int n);

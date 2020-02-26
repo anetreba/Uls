@@ -57,7 +57,7 @@ int get_rows(int count, int max_len) {
 
 void mx_flag_G(char **files_in_dir, int count, char *file_name,
     t_flag *flags) {
-    int m_l = mx_count_max_len(files_in_dir, flags, file_name);
+    int m_l = mx_count_max_len(files_in_dir);
     int rows = get_rows(count, m_l);
     int spacing = 0;
 
