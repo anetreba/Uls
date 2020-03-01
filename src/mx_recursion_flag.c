@@ -51,11 +51,11 @@ char **mx_dir_in(t_flag *flags, char *dir_name, int *dir_count, bool *k,
 			mx_print_dir_name(dir_name);
 		*k = true;
 		mx_print_recursion(files_in_dir, cou, flags, dir_name);
-		path = mx_make_path(files_in_dir, dir_name, cou, flags);
+		path = mx_make_path(files_in_dir, dir_name, &cou, flags);
+		mx_del_strarr(&files_in_dir);
 		*dir_count = mx_dir_count(path, flags);
 		if (*dir_count != 0)
 			dirs_in = mx_make_mas_of_dirs(*dir_count, path, cou, flags);
-		mx_del_strarr(&files_in_dir);
 		mx_del_strarr(&path);
 		return dirs_in; 
 	}
@@ -76,4 +76,8 @@ void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags,
 			mx_del_strarr(&dirs_in);
 		}
 	}
+	if (dirs_in != NULL) {
+		mx_del_strarr(&dirs_in);
+	}
 }
+

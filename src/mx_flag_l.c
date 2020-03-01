@@ -29,18 +29,18 @@ static void total_blocks(char **path, t_len_column *lens, char *dir_name) {
 
 static void help_flag_l(char *path, t_flag *flags, char *files_in_dir, 
     char *pr_dost, char *dir_name) {
-        mx_my_time(path, flags);
-        if (flags->flag_G)
-            mx_colour_out(files_in_dir, dir_name);
-        else if (flags->flag_p || flags->flag_F) {
-            mx_printstr(files_in_dir);
-            mx_flag_p(files_in_dir, flags, dir_name);
-        }
-        else
-            mx_printstr(files_in_dir);
-        my_readlink(pr_dost, path);
-        mx_flag_sobaka(pr_dost, path, flags);
-        mx_printchar('\n');
+    mx_my_time(path, flags);
+    if (flags->flag_G)
+        mx_colour_out(files_in_dir, dir_name);
+    else if (flags->flag_p || flags->flag_F) {
+        mx_printstr(files_in_dir);
+        mx_flag_p(files_in_dir, flags, dir_name);
+    }
+    else
+        mx_printstr(files_in_dir);
+    my_readlink(pr_dost, path);
+    mx_flag_sobaka(pr_dost, path, flags);
+    mx_printchar('\n');
 }
 
 static void rofl(char *dir_name, char **path) {

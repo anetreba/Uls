@@ -114,7 +114,7 @@ bool mx_error_case(char av, char *flag);
 int mx_dir_count(char **files_in_dir, t_flag *flags);
 char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count,
 	t_flag *flags);
-char **mx_make_path(char **dirs_in, char *dir_name, int dir_count,
+char **mx_make_path(char **dirs_in, char *dir_name, int *dir_count,
 	t_flag *flags);
 void mx_recursion_flag(char **dirs, int dir_count, t_flag *flags,
 	bool buf, int *err);

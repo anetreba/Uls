@@ -11,14 +11,13 @@ char *mx_mychmod(int mode, char *str, char *dir_mame, t_len_column *lens) {
 
     mx_strcpy(str, "-----------");
     acl = acl_get_file(dir_mame, ACL_TYPE_EXTENDED);
-    xattr = listxattr(dir_mame, buf, 0, XATTR_NOFOLLOW);
     text_acl = acl_to_text(acl, &xattr);
+    xattr = listxattr(dir_mame, buf, 0, XATTR_NOFOLLOW);
     permissions(mode, str);
     permissions2(mode, str);
+    str[10] = (text_acl != NULL) ? '+' : ' ';
     if (xattr > 0)
         str[10] = '@';
-    else
-        str[10] = (text_acl != NULL) ? '+' : ' ';
     if (str[0] == 'b' || str[0] == 'c')
         lens->bc = true;
     acl_free(acl);

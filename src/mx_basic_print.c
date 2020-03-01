@@ -16,7 +16,8 @@ void mx_flag_F(char *obj, char *file_name) {
         write(1, "|", 1);
 }
 
-int mx_num_of_cols(char **files_in_dir, int count, t_flag *flags, char *dir_name) {
+int mx_num_of_cols(char **files_in_dir, int count, t_flag *flags,
+	char *dir_name) {
 	struct winsize w;
 	int max_len = mx_count_max_len(files_in_dir);
 	int cols = 0;
@@ -28,7 +29,7 @@ int mx_num_of_cols(char **files_in_dir, int count, t_flag *flags, char *dir_name
     if (isatty(1) != 0 || flags->flag_C) {
 		cols = (w.ws_col / ((8 - (max_len % 8)) + max_len));
 		if ((cols != 0))
-			lines = count / cols; //количество елементов вывода
+			lines = count / cols;
 		if ((lines == 0) || ((cols != 0) && ((count % cols) != 0)))
 			lines++;
 		return lines;
@@ -44,7 +45,6 @@ void mx_choose_print_action(char *files_in_dir, t_flag *flags,
 	mx_printstr(files_in_dir);
 	if (flags->flag_F || flags->flag_p)
 		mx_flag_p(files_in_dir, flags, dir_name);
-
 }
 
 void basic_tab_print(int arg_len, int max_len) {

@@ -45,8 +45,8 @@ char **mx_make_mas_of_elem_in_dir(t_flag *flags, char *dir_name, int count) {
 	DIR *dir = opendir(dir_name);
 	struct dirent *entry;
 	int i = 0;
-	
 	char **files_in_dir = (char **)malloc(sizeof(char *) * (count + 1));
+	
 	while ((entry = readdir(dir)) != NULL) 
 		if (flags->flag_a == true || flags->flag_f)
 			files_in_dir[i++] = mx_strdup(entry->d_name);
@@ -71,8 +71,8 @@ void mx_current_directory(t_flag *flags, char *dir_name, int *err) {
 		
 		mx_sort_flags(flags, files_in_dir, count, dir_name);
 		mx_print_flags(flags, files_in_dir, count, dir_name, 0);
-		if (flags->flag_R) {
-			char **path = mx_make_path(files_in_dir, dir_name, count, flags);
+		if (flags->flag_R && !(flags->flag_f)) {
+			char **path = mx_make_path(files_in_dir, dir_name, &count, flags);
 			int dir_count = mx_dir_count(path, flags);
 			char **dirs_in = mx_make_mas_of_dirs(dir_count, path, count,
 				flags);

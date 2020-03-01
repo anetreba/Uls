@@ -20,7 +20,8 @@ void mx_print_G(char *files_in_dir, t_flag *flags, char *file_name,
     mx_spacing_print(spacing);
 }
 
-void mx_print_cat(char **files_in_dir, int count, t_flag *flags, char *dir_name) {
+void mx_print_cat(char **files_in_dir, int count, t_flag *flags,
+	char *dir_name) {
 	for (int i = 0; i < count; i++) {
 		mx_printstr(files_in_dir[i]);
 		if (flags->flag_p || flags->flag_F) 

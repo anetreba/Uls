@@ -1,10 +1,10 @@
 #include "uls.h"
 
-char **mx_make_path(char **dirs_in, char *dir_name, int dir_count,
+char **mx_make_path(char **dirs_in, char *dir_name, int *dir_count,
 	t_flag *flags) {
 	if (flags->flag_a)
-		dir_count -= 2;
-	char **path = (char **)malloc(sizeof(char *) * (dir_count + 1));
+		*dir_count -= 2;
+	char **path = (char **)malloc(sizeof(char *) * (*dir_count + 1));
 	char *tmp = NULL;
 	int j = 0;
 
@@ -20,7 +20,7 @@ char **mx_make_path(char **dirs_in, char *dir_name, int dir_count,
 			if (tmp != NULL)
 				free(tmp);
 		}
-	path[dir_count] = NULL;
+	path[*dir_count] = NULL;
 	return path;
 }
 
@@ -31,6 +31,7 @@ char **mx_make_mas_of_dirs(int dir_count, char **files_in_dir, int count,
 
 	if (*files_in_dir != NULL) {
 		char **dirs = (char **)malloc(sizeof(char *) * (dir_count + 1));
+		
 		for (int j = 0; j < count; j++) {
 			if (mx_link_check(files_in_dir[j], flags, &buf) >= 0) {
 					if (((buf.st_mode & S_IFDIR) == S_IFDIR)) 
@@ -65,15 +66,9 @@ void mx_colour_out(char *file, char *file_name) {
 
 int mx_get_ws() {
 	struct winsize ws;
-	int fd;
 	int cols = 0;
 
-	fd = open("/dev/tty", O_RDWR);
-	if (fd < 0)
-		err(1, "/dev/tty");
-	if (ioctl(fd, TIOCGWINSZ, &ws) < 0)
-		err(1, "/dev/tty");
-	close(fd);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
 	cols = ws.ws_col;
 	return cols;
 }

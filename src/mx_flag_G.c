@@ -4,9 +4,8 @@ char *mx_find_path(char *file, char *file_name) {
     char *filepath1 = NULL;
     char *filepath2 = NULL;
 
-    if (file_name == NULL){
+    if (file_name == NULL)
         return file;
-    }
     filepath1 = mx_strjoin(file_name, "/");
     filepath2 = mx_strjoin(filepath1, file);
     mx_strdel(&filepath1);

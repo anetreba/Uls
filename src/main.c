@@ -30,6 +30,7 @@ void mx_print_flags(t_flag *flags, char **files, int file_count, char *dir_name
 		mx_flag_G(files, file_count, dir_name, flags);
 	else {
 		int max_len = mx_count_max_len(files);
+
 		mx_basic_print(files, file_count, max_len, flags, dir_name);
 	}
 }
@@ -65,7 +66,7 @@ void mx_files_and_dir(char **file, t_flag *flags, int *err) {
 	}
 	mx_del_strarr(&files);
 	mx_sort_flags(flags, dirs, dir_count, NULL);
-	if (flags->flag_R)
+	if (flags->flag_R && !(flags->flag_f))
 		mx_recursion_flag(dirs, dir_count, flags, buf, err);
 	else 
 		mx_print_dirs(dirs, dir_count, file_count, flags, err);
@@ -77,12 +78,12 @@ int main(int ac, char **av) {
 	char **file = NULL;
 	int err = 0;
 
-
 	mx_memset(flags, 0, sizeof(t_flag));
 	file = mx_valid_flag(ac, av, flags);
 	if (file[0] == NULL)
 		mx_current_directory(flags, ".", &err);
 	else 
 		mx_files_and_dir(file, flags, &err);
+	mx_del_strarr(&file);
 	return err;
 }

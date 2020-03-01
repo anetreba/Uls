@@ -8,7 +8,7 @@ t_sort *mx_pasre_struct(char **files, char *file_name, int dir_count,
 
 	mx_memset(info_file, 0, sizeof(t_sort));
 	if (file_name != NULL) 
-		path_name = mx_make_path(files, file_name, dir_count, flags);
+		path_name = mx_make_path(files, file_name, &dir_count, flags);
 	for (int i = 0; i < dir_count; i++) {
 		info_file[i].name = mx_strdup(files[i]);
 		lstat(path_name[i], &sb);

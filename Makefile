@@ -28,7 +28,7 @@ SRC = main.c \
 	mx_bzero.c \
 	mx_my_getgrgid.c \
 	mx_flag_sobaka.c \
-	flag_h_check.c \
+	mx_flag_h_check.c \
 
 OBJ = main.o \
 	mx_recursion_flag.o \
@@ -56,7 +56,7 @@ OBJ = main.o \
 	mx_bzero.o \
 	mx_my_getgrgid.o \
 	mx_flag_sobaka.o \
-	flag_h_check.o \
+	mx_flag_h_check.o \
 
 
 CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic

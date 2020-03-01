@@ -21,12 +21,13 @@ void time_help(time_t *time, t_flag *flags, struct stat *file_info) {
         *time = file_info->st_mtime;
 }
 
-static void time_else(struct stat *file_info, char *sub, time_t time, t_flag *flags) {
-        sub = time_T(time, flags);
-        mx_printstr(sub);
-        mx_print_spaces(1);
-        free(file_info);
-        free(sub);
+static void time_else(struct stat *file_info, char *sub, time_t time,
+    t_flag *flags) {
+    sub = time_T(time, flags);
+    mx_printstr(sub);
+    mx_print_spaces(1);
+    free(file_info);
+    free(sub);
 }
 
 void mx_my_time(char *filename, t_flag *flags) {
